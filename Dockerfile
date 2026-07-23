@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     nodejs \
     npm \
-    && docker-php-ext-install pdo pdo_mysql
+    sqlite3 \
+    && docker-php-ext-install pdo pdo_mysql pdo_sqlite
 
 COPY . .
 
@@ -19,7 +20,6 @@ RUN composer install --no-dev --optimize-autoloader
 RUN npm install
 RUN npm run build
 
-RUN php artisan config:cache
 RUN php artisan route:cache
 RUN php artisan view:cache
 
