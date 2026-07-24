@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\VentaController;
+use App\Http\Controllers\ClienteController;
 
 Route::resource('productos', ProductoController::class);
 
@@ -13,6 +15,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('categorias', CategoriaController::class);
     Route::resource('productos', ProductoController::class);
+    Route::resource('ventas', VentaController::class);
+    Route::resource('clientes', ClienteController::class);
+    Route::patch('clientes/{cliente}/estado', [ClienteController::class, 'cambiarEstado'])
+    ->name('clientes.estado');
 
 });
 

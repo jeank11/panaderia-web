@@ -14,7 +14,7 @@
         🥖 Productos
     </a>
 
-    <a href="#">
+    <a href="{{ route('clientes.index') }}">
         👥 Clientes
     </a>
 
@@ -22,7 +22,7 @@
         🚚 Proveedores
     </a>
 
-    <a href="#">
+    <a href="{{ route('ventas.index') }}">
         🛒 Ventas
     </a>
 
