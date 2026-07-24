@@ -39,6 +39,42 @@
             </div>
 
         </div>
+        <div class="row mb-4">
+
+    <div class="col-md-6">
+
+        <label class="form-label">
+            <strong>Cliente</strong>
+        </label>
+
+        <select 
+                id="cliente"
+                class="form-select"
+                name="cliente_id">
+
+            <option value="">
+                Seleccione un cliente
+            </option>
+
+            @foreach($clientes as $cliente)
+
+                <option value="{{ $cliente->id }}">
+
+                    {{ $cliente->nombre_completo }}
+
+                    -
+
+                    {{ $cliente->documento }}
+
+                </option>
+
+            @endforeach
+
+        </select>
+
+    </div>
+
+</div>
 
         <form>
 
@@ -50,25 +86,28 @@
                         Producto
                     </label>
 
-                    <select class="form-select">
+                    <select
+    id="producto"
+    class="form-select">
 
-                        <option>
-                            Seleccione un producto
-                        </option>
+    <option value="">
+        Seleccione un producto
+    </option>
 
-                        @foreach($productos as $producto)
+    @foreach($productos as $producto)
 
-                            <option>
+        <option
+            value="{{ $producto->id }}"
+            data-precio="{{ $producto->precio_venta }}"
+            data-stock="{{ $producto->stock }}">
 
-                                {{ $producto->nombre }}
-                                -
-                                Stock: {{ $producto->stock }}
+            {{ $producto->nombre }}
 
-                            </option>
+        </option>
 
-                        @endforeach
+    @endforeach
 
-                    </select>
+</select>
 
                 </div>
 
@@ -79,21 +118,24 @@
                     </label>
 
                     <input
-                        type="number"
-                        class="form-control"
-                        value="1"
-                        min="1">
+    id="cantidad"
+    type="number"
+    class="form-control"
+    value="1"
+    min="1">
 
                 </div>
 
                 <div class="col-md-2">
 
-                    <button
-                        class="btn btn-primary w-100">
+                   <button
+    type="button"
+    id="agregarProducto"
+    class="btn btn-primary w-100">
 
-                        Agregar
+    Agregar
 
-                    </button>
+</button>
 
                 </div>
 
@@ -117,23 +159,25 @@
 
                     <th>Subtotal</th>
 
+                    <th>Acción</th>
+
                 </tr>
 
             </thead>
 
-            <tbody>
+            <tbody id="detalleVenta">
 
-                <tr>
+<tr>
 
-                    <td colspan="4" class="text-center">
+    <td colspan="4" class="text-center">
 
-                        Todavía no hay productos agregados.
+        Todavía no hay productos agregados.
 
-                    </td>
+    </td>
 
-                </tr>
+</tr>
 
-            </tbody>
+</tbody>
 
         </table>
 
@@ -141,16 +185,143 @@
 
             <h3>
 
-                Total:
+    Total:
 
-                $0.00
+    $<span id="totalVenta">0.00</span>
 
-            </h3>
+</h3>
 
         </div>
+        <div class="text-end mt-3">
+
+    <button
+        type="button"
+        id="guardarVenta"
+        class="btn btn-success">
+
+        💾 Guardar Venta
+
+    </button>
+
+</div>
 
     </div>
 
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+
+let total = 0;
+
+document.getElementById('agregarProducto').addEventListener('click', function () {
+    const cliente = document.getElementById('cliente');
+
+if (cliente.value === '') {
+    alert('Debe seleccionar un cliente antes de agregar productos.');
+    return;
+}
+
+    const select = document.getElementById('producto');
+    const cantidad = document.getElementById('cantidad');
+
+    if (select.value === '') {
+        alert('Seleccione un producto');
+        return;
+    }
+
+    const opcion = select.options[select.selectedIndex];
+
+    const nombre = opcion.text;
+    const precio = parseFloat(opcion.dataset.precio);
+    const stock = parseInt(opcion.dataset.stock);
+    const cant = parseInt(cantidad.value);
+
+    if (cant > stock) {
+        alert('No hay suficiente stock.');
+        return;
+    }
+
+    const subtotal = precio * cant;
+
+    const filas = document.querySelectorAll('#detalleVenta tr');
+
+for (let fila of filas) {
+
+    if (fila.dataset.producto == select.value) {
+
+        let cantidadActual = parseInt(
+            fila.children[1].innerText
+        );
+
+        cantidadActual += cant;
+
+        fila.children[1].innerText = cantidadActual;
+
+        let nuevoSubtotal = cantidadActual * precio;
+
+        fila.children[3].innerText =
+            '$' + nuevoSubtotal.toFixed(2);
+
+        total += subtotal;
+
+        document.getElementById('totalVenta').innerText =
+            total.toFixed(2);
+
+        select.selectedIndex = 0;
+        cantidad.value = 1;
+
+        return;
+    }
+
+}
+
+    const tbody = document.getElementById('detalleVenta');
+
+    if (tbody.innerHTML.includes('Todavía no hay productos')) {
+        tbody.innerHTML = '';
+    }
+
+    tbody.innerHTML += `
+        <tr data-producto="${select.value}">
+            <td>${nombre}</td>
+            <td>${cant}</td>
+            <td>$${precio.toFixed(2)}</td>
+            <td>$${subtotal.toFixed(2)}</td>
+            <td>
+              <button 
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  onclick="eliminarProducto(this, ${subtotal})">
+
+                Eliminar
+
+               </button>
+            </td>
+        </tr>
+    `;
+
+    total += subtotal;
+
+    document.getElementById('totalVenta').innerText = total.toFixed(2);
+
+    select.selectedIndex = 0;
+    cantidad.value = 1;
+
+});
+function eliminarProducto(boton, subtotal)
+{
+    boton.closest('tr').remove();
+
+    total -= subtotal;
+
+    document.getElementById('totalVenta').innerText =
+        total.toFixed(2);
+
+}
+
+</script>
+
+@endpush

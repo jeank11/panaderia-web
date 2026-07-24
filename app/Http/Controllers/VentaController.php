@@ -19,11 +19,15 @@ class VentaController extends Controller
      */
     public function create()
     {
-         $productos = \App\Models\Producto::where('estado', true)
-                    ->orderBy('nombre')
-                    ->get();
+        $clientes = \App\Models\Cliente::where('estado', true)
+                ->orderBy('apellido')
+                ->get();
 
-    return view('ventas.create', compact('productos'));
+$productos = \App\Models\Producto::where('estado', true)
+                ->orderBy('nombre')
+                ->get();
+
+return view('ventas.create', compact('clientes', 'productos'));
     }
 
     /**

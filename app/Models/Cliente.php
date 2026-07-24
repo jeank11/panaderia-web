@@ -26,4 +26,8 @@ class Cliente extends Model
     {
         return $this->nombre . ' ' . $this->apellido;
     }
+     public function ventas()
+    {
+        return $this->hasMany(Venta::class);
+    }
 }
