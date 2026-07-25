@@ -126,6 +126,33 @@ class ClienteAuthController extends Controller
 
     }
 
+    public function compras()
+{
+
+    if(!session()->has('cliente_id')){
+
+        return redirect()
+            ->route('clientes.login');
+
+    }
+
+
+    $cliente = Cliente::with([
+
+        'ventas.detalles.producto'
+
+    ])->find(
+        session('cliente_id')
+    );
+
+
+    return view(
+        'clientes.compras',
+        compact('cliente')
+    );
+
+}
+
 
 
 

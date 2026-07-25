@@ -69,10 +69,21 @@ Route::post(
 )->name('clientes.login.post');
 
 
-Route::get(
-    '/portal/perfil',
-    [ClienteAuthController::class, 'perfil']
-)->name('clientes.perfil');
+Route::middleware(['cliente'])->group(function () {
+
+
+    Route::get(
+        '/portal/perfil',
+        [ClienteAuthController::class, 'perfil']
+    )->name('clientes.perfil');
+
+    Route::get(
+    '/portal/compras',
+    [ClienteAuthController::class,'compras']
+)->name('clientes.compras');
+
+
+});
 
 Route::get(
     '/portal/logout',

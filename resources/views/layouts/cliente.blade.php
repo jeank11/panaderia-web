@@ -95,7 +95,7 @@
 
                     <a
                         class="nav-link"
-                        href="#">
+                        href="{{ route('clientes.compras') }}">
 
                         Mis Compras
 
