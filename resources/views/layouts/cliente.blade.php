@@ -119,7 +119,7 @@
 
                     <a
                         class="nav-link text-warning"
-                        href="#">
+                        href="{{ route('clientes.logout') }}">
 
                         Cerrar Sesión
 

@@ -30,13 +30,24 @@
 
             </a>
 
-            <a href="/portal/login" class="btn btn-outline-light btn-lg">
+            <a href="/portal/login" class="btn btn-outline-light btn-lg me-3">
 
-                <i class="bi bi-person-circle"></i>
+    <i class="bi bi-person-circle"></i>
 
-                Iniciar Sesión
+    Iniciar Sesión
 
-            </a>
+</a>
+
+
+<a href="{{ route('clientes.registro') }}"
+   class="btn btn-light btn-lg">
+
+    <i class="bi bi-person-plus"></i>
+
+    Crear Cuenta
+
+</a>
+
 
         </div>
 

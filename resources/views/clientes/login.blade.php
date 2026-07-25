@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.web')
 
 @section('contenido')
 
@@ -60,6 +60,20 @@
                         Ingresar
 
                     </button>
+                    <div class="text-center mt-3">
+
+    <p>
+        ¿Todavía no tienes una cuenta?
+    </p>
+
+    <a href="{{ route('clientes.registro') }}"
+       class="btn btn-warning w-100">
+
+        Crear cuenta
+
+    </a>
+
+</div>
 
                 </form>
 

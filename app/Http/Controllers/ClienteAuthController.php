@@ -8,63 +8,145 @@ use Illuminate\Support\Facades\Hash;
 
 class ClienteAuthController extends Controller
 {
+
+
     /**
-     * Mostrar formulario de login del cliente.
+     * Mostrar login cliente
      */
     public function showLogin()
     {
         return view('clientes.login');
     }
 
+
+
     /**
-     * Procesar inicio de sesión.
+     * Login cliente
      */
     public function login(Request $request)
     {
+
         $request->validate([
+
             'email' => 'required|email',
+
             'password' => 'required'
+
         ]);
 
-        $cliente = Cliente::where('email', $request->email)->first();
 
-        if (
+
+        $cliente = Cliente::where(
+            'email',
+            $request->email
+        )->first();
+
+
+
+        if(
             $cliente &&
-            Hash::check($request->password, $cliente->password)
-        ) {
+            Hash::check(
+                $request->password,
+                $cliente->password
+            )
+        ){
+
 
             session([
                 'cliente_id' => $cliente->id
             ]);
 
-            return redirect('/portal/perfil');
+
+
+            return redirect()
+                ->route('clientes.perfil');
+
+
         }
 
-        return back()->with(
-            'error',
-            'Correo o contraseña incorrectos.'
+
+
+        return back()
+            ->with(
+                'error',
+                'Correo o contraseña incorrectos.'
+            );
+
+    }
+
+
+
+
+
+    /**
+     * Perfil del cliente
+     */
+    public function perfil()
+    {
+
+        if(!session()->has('cliente_id')){
+
+            return redirect()
+                ->route('clientes.login');
+
+        }
+
+
+
+        $cliente = Cliente::with([
+
+            'ventas' => function($query){
+
+                $query->latest();
+
+            }
+
+        ])->find(
+            session('cliente_id')
         );
-    }
-public function perfil()
-{
-    $cliente = Cliente::with([
-        'ventas' => function ($query) {
 
-            $query->latest();
+
+
+        if(!$cliente){
+
+            session()->forget('cliente_id');
+
+
+            return redirect()
+                ->route('clientes.login');
 
         }
 
-    ])->find(session('cliente_id'));
 
-    if (!$cliente) {
 
-        return redirect()->route('clientes.login');
+        return view(
+            'clientes.perfil',
+            compact('cliente')
+        );
 
     }
 
-    return view(
-        'clientes.perfil',
-        compact('cliente')
-    );
-}
+
+
+
+
+    /**
+     * Cerrar sesión cliente
+     */
+    public function logout()
+    {
+
+        session()->forget('cliente_id');
+
+
+        return redirect()
+            ->route('clientes.login')
+            ->with(
+                'success',
+                'Sesión cerrada correctamente.'
+            );
+
+    }
+
+
 }
