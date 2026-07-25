@@ -93,17 +93,9 @@ class ClienteAuthController extends Controller
 
 
 
-        $cliente = Cliente::with([
-
-            'ventas' => function($query){
-
-                $query->latest();
-
-            }
-
-        ])->find(
-            session('cliente_id')
-        );
+        $cliente = Cliente::find(
+    session('cliente_id')
+);
 
 
 
@@ -150,6 +142,151 @@ class ClienteAuthController extends Controller
         'clientes.compras',
         compact('cliente')
     );
+
+}
+
+
+
+public function detalleCompra($id)
+{
+
+    $clienteId = session('cliente_id');
+
+
+    $venta = \App\Models\Venta::with([
+        'detalles.producto'
+    ])
+    ->where('cliente_id',$clienteId)
+    ->where('id',$id)
+    ->firstOrFail();
+
+
+
+    return view(
+        'clientes.detalle_compra',
+        compact('venta')
+    );
+
+}
+public function editarPerfil()
+{
+
+    $cliente = Cliente::find(
+        session('cliente_id')
+    );
+
+
+    return view(
+        'clientes.editar_perfil',
+        compact('cliente')
+    );
+
+}
+
+
+
+public function actualizarPerfil(Request $request)
+{
+
+    $cliente = Cliente::find(
+        session('cliente_id')
+    );
+
+
+    $request->validate([
+
+        'nombre' => 'required',
+        'apellido' => 'required',
+        'telefono' => 'required',
+        'direccion' => 'required'
+
+    ]);
+
+
+    $cliente->update([
+
+        'nombre' => $request->nombre,
+
+        'apellido' => $request->apellido,
+
+        'telefono' => $request->telefono,
+
+        'direccion' => $request->direccion,
+
+        'fecha_nacimiento' => $request->fecha_nacimiento
+
+    ]);
+
+
+    return redirect()
+        ->route('clientes.perfil')
+        ->with(
+            'success',
+            'Perfil actualizado correctamente.'
+        );
+
+}
+
+public function formPassword()
+{
+
+    return view(
+        'clientes.cambiar_password'
+    );
+
+}
+
+
+
+public function cambiarPassword(Request $request)
+{
+
+    $request->validate([
+
+        'password_actual' => 'required',
+
+        'password' => 'required|min:8|confirmed'
+
+    ]);
+
+
+
+    $cliente = Cliente::find(
+        session('cliente_id')
+    );
+
+
+
+    if(!Hash::check(
+        $request->password_actual,
+        $cliente->password
+    )){
+
+        return back()
+            ->with(
+                'error',
+                'La contraseña actual no es correcta.'
+            );
+
+    }
+
+
+
+    $cliente->password = Hash::make(
+        $request->password
+    );
+
+
+    $cliente->save();
+
+
+
+    return redirect()
+        ->route('clientes.perfil')
+        ->with(
+            'success',
+            'Contraseña actualizada correctamente.'
+        );
 
 }
 

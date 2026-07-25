@@ -111,96 +111,11 @@
                 </div>
 
             </div>
-            <hr>
 
-<h4 class="mb-3">
-    🛒 Mis Compras
-</h4>
-
-@if($cliente->ventas->count())
-
-<table class="table table-bordered table-hover">
-
-    <thead class="table-dark">
-
-        <tr>
-
-            <th>Fecha</th>
-
-            <th>Total</th>
-
-            <th>Estado</th>
-
-            <th width="120">Acción</th>
-
-        </tr>
-
-    </thead>
-
-    <tbody>
-
-        @foreach($cliente->ventas as $venta)
-
-        <tr>
-
-            <td>
-                {{ \Carbon\Carbon::parse($venta->fecha)->format('d/m/Y') }}
-            </td>
-
-            <td>
-                ${{ number_format($venta->total,2) }}
-            </td>
-
-            <td>
-
-                @if($venta->estado)
-
-                    <span class="badge bg-success">
-                        Activa
-                    </span>
-
-                @else
-
-                    <span class="badge bg-danger">
-                        Anulada
-                    </span>
-
-                @endif
-
-            </td>
-
-            <td>
-
-                <a
-                    href="{{ route('ventas.show',$venta) }}"
-                    class="btn btn-primary btn-sm">
-
-                    Ver
-
-                </a>
-
-            </td>
-
-        </tr>
-
-        @endforeach
-
-    </tbody>
-
-</table>
-
-@else
-
-<div class="alert alert-info">
-
-    Todavía no tienes compras registradas.
-
-</div>
-
-@endif
             <div class="card-footer text-end">
 
-                <a href="#" class="btn btn-warning">
+                <a href="{{ route('clientes.perfil.editar') }}"
+   class="btn btn-warning">
 
                     ✏️ Editar Perfil
 

@@ -82,6 +82,22 @@ Route::middleware(['cliente'])->group(function () {
     [ClienteAuthController::class,'compras']
 )->name('clientes.compras');
 
+Route::get(
+    '/portal/compra/{venta}',
+    [ClienteAuthController::class,'detalleCompra']
+)->name('clientes.detalle.compra');
+
+Route::get(
+    '/portal/perfil/editar',
+    [ClienteAuthController::class,'editarPerfil']
+)->name('clientes.perfil.editar');
+
+
+Route::put(
+    '/portal/perfil',
+    [ClienteAuthController::class,'actualizarPerfil']
+)->name('clientes.perfil.actualizar');
+
 
 });
 
@@ -89,6 +105,17 @@ Route::get(
     '/portal/logout',
     [ClienteAuthController::class,'logout']
 )->name('clientes.logout');
+
+Route::get(
+    '/portal/cambiar-password',
+    [ClienteAuthController::class,'formPassword']
+)->name('clientes.password.form');
+
+
+Route::put(
+    '/portal/cambiar-password',
+    [ClienteAuthController::class,'cambiarPassword']
+)->name('clientes.password.update');
 
 
 

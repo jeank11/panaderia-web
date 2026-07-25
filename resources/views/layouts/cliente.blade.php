@@ -105,13 +105,13 @@
 
                 <li class="nav-item">
 
-                    <a
-                        class="nav-link"
-                        href="#">
+                   <a
+    class="nav-link"
+    href="{{ route('clientes.password.form') }}">
 
-                        Cambiar Contraseña
+    Cambiar Contraseña
 
-                    </a>
+</a>
 
                 </li>
 

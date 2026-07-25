@@ -14,89 +14,144 @@
 <div class="card shadow mb-4">
 
 
-<div class="card-header bg-primary text-white">
+    <div class="card-header bg-primary text-white">
 
-    Compra #{{ $venta->id }}
+        <h5 class="mb-0">
 
-</div>
+            Compra #{{ $venta->id }}
 
+        </h5>
 
-<div class="card-body">
-
-
-<p>
-<strong>Fecha:</strong>
-
-{{ \Carbon\Carbon::parse($venta->fecha)->format('d/m/Y') }}
-
-</p>
+    </div>
 
 
-<p>
-
-<strong>Total:</strong>
-
-${{ number_format($venta->total,2) }}
-
-</p>
+    <div class="card-body">
 
 
-<p>
+        <p>
 
-<strong>Estado:</strong>
+            <strong>Fecha:</strong>
 
-@if($venta->estado)
+            {{ \Carbon\Carbon::parse($venta->fecha)->format('d/m/Y') }}
 
-<span class="badge bg-success">
-Activa
-</span>
-
-@else
-
-<span class="badge bg-danger">
-Anulada
-</span>
-
-@endif
-
-</p>
+        </p>
 
 
+        <p>
 
-<hr>
+            <strong>Total:</strong>
 
+            ${{ number_format($venta->total,2) }}
 
-<h5>
-Productos
-</h5>
-
-
-<ul>
-
-@foreach($venta->detalles as $detalle)
-
-<li>
-
-{{ $detalle->producto->nombre }}
-
--
-
-Cantidad:
-{{ $detalle->cantidad }}
-
--
-
-${{ number_format($detalle->subtotal,2) }}
-
-</li>
-
-@endforeach
+        </p>
 
 
-</ul>
+        <p>
+
+            <strong>Estado:</strong>
 
 
-</div>
+            @if($venta->estado)
+
+                <span class="badge bg-success">
+
+                    Activa
+
+                </span>
+
+            @else
+
+                <span class="badge bg-danger">
+
+                    Anulada
+
+                </span>
+
+            @endif
+
+
+        </p>
+
+
+
+        <hr>
+
+
+        <h5>
+
+            Productos
+
+        </h5>
+
+
+        <ul class="list-group mb-3">
+
+
+            @foreach($venta->detalles as $detalle)
+
+
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+
+
+                    <div>
+
+                        <strong>
+
+                            {{ $detalle->producto->nombre }}
+
+                        </strong>
+
+
+                        <br>
+
+
+                        Cantidad:
+
+                        {{ $detalle->cantidad }}
+
+
+                    </div>
+
+
+
+                    <span>
+
+                        ${{ number_format($detalle->subtotal,2) }}
+
+                    </span>
+
+
+                </li>
+
+
+            @endforeach
+
+
+        </ul>
+
+
+
+        <div class="text-end">
+
+
+            <a href="{{ route('clientes.detalle.compra',$venta->id) }}"
+
+               class="btn btn-primary">
+
+
+                <i class="bi bi-eye"></i>
+
+                Ver detalle
+
+
+            </a>
+
+
+        </div>
+
+
+
+    </div>
 
 
 </div>
@@ -105,9 +160,9 @@ ${{ number_format($detalle->subtotal,2) }}
 @empty
 
 
-<div class="alert alert-info">
+<div class="alert alert-info text-center">
 
-Todavía no tienes compras.
+    Todavía no tienes compras registradas.
 
 </div>
 
