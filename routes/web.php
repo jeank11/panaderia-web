@@ -1,15 +1,31 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\ClienteAuthController;
+use App\Http\Controllers\WebController;
 
-Route::resource('productos', ProductoController::class);
+/*
+|--------------------------------------------------------------------------
+| Página principal
+|--------------------------------------------------------------------------
+*/
 
-Route::resource('categorias', CategoriaController::class);
+Route::get('/', [WebController::class,'inicio']);
+Route::get(
+    '/producto/{producto}',
+    [ProductoController::class,'detalle']
+)->name('producto.detalle');
+
+/*
+|--------------------------------------------------------------------------
+| Panel administrativo (requiere login)
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware(['auth'])->group(function () {
 
@@ -17,23 +33,71 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('productos', ProductoController::class);
     Route::resource('ventas', VentaController::class);
     Route::resource('clientes', ClienteController::class);
-    Route::patch('clientes/{cliente}/estado', [ClienteController::class, 'cambiarEstado'])
-    ->name('clientes.estado');
 
+    Route::patch(
+        'clientes/{cliente}/estado',
+        [ClienteController::class, 'cambiarEstado']
+    )->name('clientes.estado');
+
+    Route::get(
+        'ventas/{venta}/ticket',
+        [VentaController::class, 'ticket']
+    )->name('ventas.ticket');
+
+    Route::put(
+        'ventas/{venta}/anular',
+        [VentaController::class, 'anular']
+    )->name('ventas.anular');
+
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+
+        Route::patch(
+    'productos/{producto}/estado',
+    [ProductoController::class,'cambiarEstado']
+)->name('productos.estado');
 });
 
-Route::get('/', function () {
-    return view('welcome');
-});
+/*
+|--------------------------------------------------------------------------
+| Portal del cliente
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get(
+    '/portal/login',
+    [ClienteAuthController::class, 'showLogin']
+)->name('clientes.login');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+Route::post(
+    '/portal/login',
+    [ClienteAuthController::class, 'login']
+)->name('clientes.login.post');
+
+Route::get(
+    '/portal/perfil',
+    [ClienteAuthController::class, 'perfil']
+)->name('clientes.perfil');
+
+Route::get(
+    '/producto/{producto}',
+    [ProductoController::class,'detalle']
+)->name('producto.detalle');
+
+/*
+|--------------------------------------------------------------------------
+| Autenticación Laravel
+|--------------------------------------------------------------------------
+*/
 
 require __DIR__.'/auth.php';

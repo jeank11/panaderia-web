@@ -213,7 +213,7 @@
 
 @push('scripts')
 <script>
-
+let productosVenta = [];
 let total = 0;
 
 document.getElementById('agregarProducto').addEventListener('click', function () {
@@ -245,6 +245,25 @@ if (cliente.value === '') {
     }
 
     const subtotal = precio * cant;
+let existe = productosVenta.find(
+    producto => producto.producto_id == select.value
+);
+
+if (existe) {
+
+    existe.cantidad += cant;
+    existe.subtotal = existe.cantidad * existe.precio;
+
+} else {
+
+    productosVenta.push({
+        producto_id: select.value,
+        cantidad: cant,
+        precio: precio,
+        subtotal: subtotal
+    });
+
+}
 
     const filas = document.querySelectorAll('#detalleVenta tr');
 
@@ -272,6 +291,7 @@ for (let fila of filas) {
 
         select.selectedIndex = 0;
         cantidad.value = 1;
+        console.log(productosVenta);
 
         return;
     }
@@ -321,6 +341,57 @@ function eliminarProducto(boton, subtotal)
         total.toFixed(2);
 
 }
+
+document.getElementById('guardarVenta')
+.addEventListener('click', function(){
+
+    const cliente = document.getElementById('cliente').value;
+
+    if(cliente === ''){
+        alert('Seleccione un cliente');
+        return;
+    }
+
+    if(productosVenta.length === 0){
+        alert('Agregue productos a la venta');
+        return;
+    }
+
+
+    fetch('/ventas', {
+
+        method: 'POST',
+
+        headers: {
+
+            'Content-Type': 'application/json',
+
+            'X-CSRF-TOKEN':
+            document.querySelector('meta[name="csrf-token"]').content
+
+        },
+
+        body: JSON.stringify({
+
+            cliente_id: cliente,
+
+            productos: productosVenta,
+
+            total: total
+
+        })
+
+    })
+    .then(response => response.json())
+
+    .then(data => {
+
+        console.log(data);
+
+    });
+
+});
+
 
 </script>
 

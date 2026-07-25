@@ -2,69 +2,233 @@
 
 @section('contenido')
 
-<h2 class="mb-4">Productos</h2>
+<h2 class="mb-4">
+    Productos
+</h2>
+
+
 @if(session('success'))
+
 <div class="alert alert-success">
+
     {{ session('success') }}
+
 </div>
+
 @endif
 
-<a href="{{ route('productos.create') }}" class="btn btn-success mb-3">
+
+
+<a href="{{ route('productos.create') }}"
+   class="btn btn-success mb-3">
+
     Nuevo producto
+
 </a>
 
-<table class="table table-bordered bg-white">
 
-    <thead class="table-dark">
 
-    <tr>
+<table class="table table-bordered table-hover bg-white">
 
-        <th>Código</th>
-        <th>Nombre</th>
-        <th>Categoría</th>
-        <th>Precio Venta</th>
-        <th>Stock</th>
+<thead class="table-dark">
 
-    </tr>
+<tr>
 
-    </thead>
+    <th>Imagen</th>
+    <th>Código</th>
+    <th>Nombre</th>
+    <th>Categoría</th>
+    <th>Precio Venta</th>
+    <th>Stock</th>
+    <th>Estado</th>
+    <th width="180">
+        Acciones
+    </th>
 
-    <tbody>
+</tr>
 
-    @forelse($productos as $producto)
+</thead>
 
-        <tr>
 
-            <td>{{ $producto->codigo }}</td>
 
-            <td>{{ $producto->nombre }}</td>
+<tbody>
 
-            <td>{{ $producto->categoria->nombre }}</td>
 
-            <td>${{ number_format($producto->precio_venta,2) }}</td>
+@forelse($productos as $producto)
 
-            <td>{{ $producto->stock }}</td>
 
-        </tr>
+<tr>
 
-    @empty
 
-        <tr>
+<td>
 
-            <td colspan="5" class="text-center">
+@if($producto->imagen)
 
-                No existen productos registrados.
+<img
+src="{{ asset('storage/'.$producto->imagen) }}"
+width="70"
+height="70"
+style="object-fit:cover"
+class="rounded">
 
-            </td>
+@else
 
-        </tr>
+<span class="text-muted">
 
-    @endforelse
+Sin imagen
 
-    </tbody>
+</span>
+
+@endif
+
+
+</td>
+
+
+
+<td>
+
+{{ $producto->codigo }}
+
+</td>
+
+
+
+<td>
+
+{{ $producto->nombre }}
+
+</td>
+
+
+
+<td>
+
+{{ $producto->categoria->nombre }}
+
+</td>
+
+
+
+<td>
+
+${{ number_format($producto->precio_venta,2) }}
+
+</td>
+
+
+
+<td>
+
+{{ $producto->stock }}
+
+</td>
+
+
+
+<td>
+
+
+@if($producto->estado)
+
+<span class="badge bg-success">
+
+Activo
+
+</span>
+
+
+@else
+
+<span class="badge bg-danger">
+
+Inactivo
+
+</span>
+
+
+@endif
+
+
+</td>
+
+
+
+
+<td>
+
+
+<a href="{{ route('productos.edit',$producto) }}"
+   class="btn btn-primary btn-sm">
+
+    Editar
+
+</a>
+
+
+
+<form action="{{ route('productos.estado',$producto) }}"
+      method="POST"
+      style="display:inline">
+
+@csrf
+
+@method('PATCH')
+
+
+<button class="btn btn-warning btn-sm">
+
+@if($producto->estado)
+
+Desactivar
+
+@else
+
+Activar
+
+@endif
+
+</button>
+
+
+</form>
+
+
+</td>
+
+
+</tr>
+
+
+
+@empty
+
+
+<tr>
+
+<td colspan="8"
+class="text-center">
+
+No existen productos registrados.
+
+</td>
+
+</tr>
+
+
+@endforelse
+
+
+
+</tbody>
+
 
 </table>
 
+
+
 {{ $productos->links() }}
+
+
 
 @endsection
