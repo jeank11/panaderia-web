@@ -21,47 +21,31 @@
     <style>
 
         body{
-
             background:#FFF8F0;
-
             font-family:Arial, Helvetica, sans-serif;
-
         }
 
         .navbar{
-
             background:#8B4513;
-
         }
 
         .navbar-brand{
-
             font-size:28px;
-
             font-weight:bold;
-
             color:white !important;
-
         }
 
         .nav-link{
-
             color:white !important;
-
             font-weight:500;
-
         }
 
         .nav-link:hover{
-
             color:#FFD54F !important;
-
         }
 
         .hero{
-
             padding:100px 0;
-
             background:linear-gradient(
                 rgba(0,0,0,.45),
                 rgba(0,0,0,.45)
@@ -69,23 +53,15 @@
             url('https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1600&q=80');
 
             background-size:cover;
-
             background-position:center;
-
             color:white;
-
         }
 
         footer{
-
             background:#8B4513;
-
             color:white;
-
             padding:25px;
-
             margin-top:60px;
-
         }
 
     </style>
@@ -131,7 +107,7 @@ Inicio
 
 <li class="nav-item">
 
-<a class="nav-link" href="#">
+<a class="nav-link" href="#productos">
 
 Productos
 
@@ -154,6 +130,24 @@ Nosotros
 <a class="nav-link" href="#">
 
 Contacto
+
+</a>
+
+</li>
+
+<li class="nav-item">
+
+<a
+class="nav-link"
+href="{{ route('carrito.index') }}">
+
+🛒 Carrito
+
+<span class="badge bg-warning text-dark">
+
+{{ count(session('carrito', [])) }}
+
+</span>
 
 </a>
 

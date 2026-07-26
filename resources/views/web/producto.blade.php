@@ -13,32 +13,55 @@
             @if($producto->imagen)
 
                 <img
-                src="{{ asset('storage/'.$producto->imagen) }}"
-                class="img-fluid rounded shadow">
+                    src="{{ asset('storage/'.$producto->imagen) }}"
+                    class="img-fluid rounded shadow">
 
             @else
 
                 <div class="alert alert-secondary">
+
                     Sin imagen disponible
+
                 </div>
 
             @endif
 
         </div>
 
-
         <div class="col-md-6">
 
+            @if(session('success'))
+
+                <div class="alert alert-success">
+
+                    {{ session('success') }}
+
+                </div>
+
+            @endif
+            @if(session('error'))
+
+<div class="alert alert-danger">
+
+    {{ session('error') }}
+
+</div>
+
+@endif
+
             <h1>
+
                 {{ $producto->nombre }}
+
             </h1>
 
-
             <p>
-                Código:
-                {{ $producto->codigo }}
-            </p>
 
+                <strong>Código:</strong>
+
+                {{ $producto->codigo }}
+
+            </p>
 
             <h3 class="text-success">
 
@@ -46,18 +69,29 @@
 
             </h3>
 
-
             <p>
-                Stock disponible:
+
+                <strong>Stock disponible:</strong>
+
                 {{ $producto->stock }}
+
             </p>
 
+            <form
+                action="{{ route('carrito.agregar', $producto) }}"
+                method="POST">
 
-            <button class="btn btn-warning btn-lg">
+                @csrf
 
-                🛒 Agregar al carrito
+                <button
+                    type="submit"
+                    class="btn btn-warning btn-lg">
 
-            </button>
+                    🛒 Agregar al carrito
+
+                </button>
+
+            </form>
 
         </div>
 

@@ -105,6 +105,18 @@
 
                 <li class="nav-item">
 
+    <a
+        class="nav-link"
+        href="{{ route('carrito.index') }}">
+
+        🛒 Mi Carrito
+
+    </a>
+
+</li>
+
+                <li class="nav-item">
+
                    <a
     class="nav-link"
     href="{{ route('clientes.password.form') }}">

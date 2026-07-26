@@ -12,6 +12,7 @@ use App\Http\Controllers\ClienteAuthController;
 use App\Http\Controllers\ClienteRegistroController;
 use App\Http\Controllers\WebController;
 use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\CarritoController;
 
 
 /*
@@ -20,6 +21,22 @@ use App\Http\Controllers\PedidoController;
 |--------------------------------------------------------------------------
 */
 
+Route::post('/carrito/agregar/{producto}', [CarritoController::class, 'agregar'])
+    ->name('carrito.agregar');
+    Route::post('/carrito/aumentar/{producto}', [CarritoController::class, 'aumentar'])
+    ->name('carrito.aumentar');
+
+Route::post('/carrito/disminuir/{producto}', [CarritoController::class, 'disminuir'])
+    ->name('carrito.disminuir');
+
+Route::post('/carrito/eliminar/{producto}', [CarritoController::class, 'eliminar'])
+    ->name('carrito.eliminar');
+
+Route::post('/carrito/vaciar', [CarritoController::class, 'vaciar'])
+    ->name('carrito.vaciar');
+
+Route::get('/carrito', [CarritoController::class, 'index'])
+    ->name('carrito.index');
 
 Route::get('/', [WebController::class,'inicio']);
 
@@ -117,6 +134,18 @@ Route::put(
     '/portal/cambiar-password',
     [ClienteAuthController::class,'cambiarPassword']
 )->name('clientes.password.update');
+
+Route::get('/carrito', [CarritoController::class, 'index'])
+    ->name('carrito.index');
+
+Route::post('/carrito/agregar/{producto}', [CarritoController::class, 'agregar'])
+    ->name('carrito.agregar');
+
+Route::post('/carrito/eliminar/{producto}', [CarritoController::class, 'eliminar'])
+    ->name('carrito.eliminar');
+
+Route::post('/carrito/vaciar', [CarritoController::class, 'vaciar'])
+    ->name('carrito.vaciar');
 
 
 
