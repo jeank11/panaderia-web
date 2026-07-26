@@ -38,4 +38,8 @@ class Cliente extends Authenticatable
     {
         return $this->hasMany(Venta::class);
     }
+    public function pedidos()
+{
+    return $this->hasMany(Pedido::class);
+}
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ClienteAuthController;
 use App\Http\Controllers\ClienteRegistroController;
 use App\Http\Controllers\WebController;
+use App\Http\Controllers\PedidoController;
 
 
 /*
@@ -129,7 +130,7 @@ Route::put(
 
 Route::middleware(['auth'])->group(function () {
 
-
+    Route::resource('pedidos', PedidoController::class);
     Route::resource(
         'categorias',
         CategoriaController::class

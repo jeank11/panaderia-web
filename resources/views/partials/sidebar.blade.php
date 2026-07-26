@@ -22,6 +22,11 @@
         🚚 Proveedores
     </a>
 
+    <a href="{{ route('pedidos.index') }}">
+
+        📦 Pedidos
+    </a>
+
     <a href="{{ route('ventas.index') }}">
         🛒 Ventas
     </a>
