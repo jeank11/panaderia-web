@@ -138,7 +138,7 @@ Route::put(
 
 });
 
-Route::get(
+Route::post(
     '/portal/logout',
     [ClienteAuthController::class,'logout']
 )->name('clientes.logout');
@@ -259,6 +259,11 @@ Route::middleware(['auth'])->group(function () {
         '/profile',
         [ProfileController::class,'destroy']
     )->name('profile.destroy');
+
+    Route::patch(
+    'pedidos/{pedido}/estado',
+    [PedidoController::class, 'cambiarEstado']
+)->name('pedidos.estado');
 
 
 });

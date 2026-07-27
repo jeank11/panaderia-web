@@ -113,61 +113,58 @@
 
 
 
-                    <td>
+<td>
 
+<form
+    action="{{ route('pedidos.estado', $pedido) }}"
+    method="POST">
 
-                        @if($pedido->estado == 'Pendiente')
+    @csrf
+    @method('PATCH')
 
+    <select
+        name="estado"
+        class="form-select form-select-sm"
+        onchange="this.form.submit()">
 
-                            <span class="badge bg-warning text-dark">
+        <option value="Pendiente"
+            {{ $pedido->estado == 'Pendiente' ? 'selected' : '' }}>
+            🟡 Pendiente
+        </option>
 
-                                🟡 Pendiente
+        <option value="Preparando"
+            {{ $pedido->estado == 'Preparando' ? 'selected' : '' }}>
+            🔵 Preparando
+        </option>
 
-                            </span>
+        <option value="Listo"
+            {{ $pedido->estado == 'Listo' ? 'selected' : '' }}>
+            🟢 Listo
+        </option>
 
+        <option value="Entregado"
+            {{ $pedido->estado == 'Entregado' ? 'selected' : '' }}>
+            ✅ Entregado
+        </option>
 
-                        @elseif($pedido->estado == 'Preparando')
+        <option value="Cancelado"
+            {{ $pedido->estado == 'Cancelado' ? 'selected' : '' }}>
+            ❌ Cancelado
+        </option>
 
+    </select>
 
-                            <span class="badge bg-primary">
+</form>
 
-                                🔵 Preparando
-
-                            </span>
-
-
-                        @elseif($pedido->estado == 'Listo')
-
-
-                            <span class="badge bg-success">
-
-                                🟢 Listo
-
-                            </span>
-
-
-                        @else
-
-
-                            <span class="badge bg-secondary">
-
-                                {{ $pedido->estado }}
-
-                            </span>
-
-
-                        @endif
-
-
-                    </td>
+</td>
 
 
 
                     <td>
 
 
-                       <a
-href="{{ route('pedidos.show',$pedido) }}"
+                        <a
+href="{{ route('pedidos.show', $pedido) }}"
 class="btn btn-primary btn-sm">
 
     Ver

@@ -205,5 +205,22 @@ class PedidoController extends Controller
             );
 
     }
+    public function cambiarEstado(Request $request, Pedido $pedido)
+{
+    $request->validate([
+        'estado' => 'required'
+    ]);
+
+    $pedido->update([
+        'estado' => $request->estado
+    ]);
+
+    return redirect()
+        ->route('pedidos.index')
+        ->with(
+            'success',
+            'Estado actualizado correctamente.'
+        );
+}
 
 }
