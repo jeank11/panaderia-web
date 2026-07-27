@@ -46,6 +46,25 @@ Route::get(
     [ProductoController::class,'detalle']
 )->name('producto.detalle');
 
+Route::get(
+    '/pedido/confirmar',
+    [PedidoController::class,'confirmar']
+)
+->name('pedido.confirmar');
+
+
+Route::post(
+    '/pedido/guardar',
+    [PedidoController::class,'guardar']
+)
+->name('pedido.guardar');
+
+Route::get(
+    '/pedidos/{pedido}',
+    [PedidoController::class,'show']
+)
+->name('pedidos.show');
+
 
 
 /*

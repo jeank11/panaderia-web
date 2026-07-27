@@ -153,17 +153,51 @@ href="{{ route('carrito.index') }}">
 
 </li>
 
+@if(session()->has('cliente_id'))
+
 <li class="nav-item">
 
-<a
-class="btn btn-warning ms-3"
-href="/portal/login">
+    <a
+    class="nav-link"
+    href="{{ route('clientes.perfil') }}">
 
-Ingresar
+        👤 Mi Perfil
 
-</a>
+    </a>
 
 </li>
+
+<li class="nav-item">
+
+<li class="nav-item">
+
+    <a
+        href="{{ route('clientes.logout') }}"
+        class="btn btn-danger ms-3">
+
+        🚪 Salir
+
+    </a>
+
+</li>
+
+</li>
+
+@else
+
+<li class="nav-item">
+
+    <a
+    class="btn btn-warning ms-3"
+    href="{{ route('clientes.login') }}">
+
+        Ingresar
+
+    </a>
+
+</li>
+
+@endif
 
 </ul>
 

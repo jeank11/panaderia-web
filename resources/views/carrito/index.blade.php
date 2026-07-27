@@ -197,12 +197,12 @@
                     </h3>
 
                     <a
-                        href="#"
-                        class="btn btn-success btn-lg mt-2">
+href="{{ route('pedido.confirmar') }}"
+class="btn btn-success btn-lg mt-2">
 
-                        ✅ Confirmar Pedido
+✅ Confirmar Pedido
 
-                    </a>
+</a>
 
                 </div>
 

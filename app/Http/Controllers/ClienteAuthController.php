@@ -52,9 +52,11 @@ class ClienteAuthController extends Controller
         ){
 
 
-            session([
-                'cliente_id' => $cliente->id
-            ]);
+           $request->session()->regenerate();
+
+session([
+    'cliente_id' => $cliente->id
+]);
 
 
 
