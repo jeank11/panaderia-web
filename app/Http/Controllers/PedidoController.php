@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Pedido;
 use App\Models\DetallePedido;
 use Carbon\Carbon;
+use App\Models\Venta;
+use App\Models\DetalleVenta;
+use Illuminate\Support\Facades\Auth;
 
 class PedidoController extends Controller
 {
@@ -211,9 +214,68 @@ class PedidoController extends Controller
         'estado' => 'required'
     ]);
 
-    $pedido->update([
-        'estado' => $request->estado
-    ]);
+
+    $pedido->estado = $request->estado;
+
+    $pedido->save();
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Crear venta cuando el pedido pasa a Entregado
+    |--------------------------------------------------------------------------
+    */
+
+
+   if(
+    $request->estado == 'Entregado'
+    &&
+    !Venta::where('pedido_id',$pedido->id)->exists()
+){
+
+
+        $venta = Venta::create([
+
+            'user_id' => Auth::id(),
+
+            'cliente_id' => $pedido->cliente_id,
+
+            'pedido_id' => $pedido->id,
+
+            'fecha' => Carbon::now(),
+
+            'total' => $pedido->total,
+
+            'estado' => true
+
+        ]);
+
+
+
+        foreach($pedido->detalles as $detalle){
+
+
+            DetalleVenta::create([
+
+                'venta_id' => $venta->id,
+
+                'producto_id' => $detalle->producto_id,
+
+                'cantidad' => $detalle->cantidad,
+
+                'precio' => $detalle->precio,
+
+                'subtotal' => $detalle->subtotal
+
+            ]);
+
+        }
+
+
+    }
+
+
 
     return redirect()
         ->route('pedidos.index')

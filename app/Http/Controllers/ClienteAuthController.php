@@ -120,31 +120,49 @@ session([
 
     }
 
-    public function compras()
+public function pedidos()
 {
-
-    if(!session()->has('cliente_id')){
-
-        return redirect()
-            ->route('clientes.login');
-
-    }
+    $cliente = Cliente::find(
+        session('cliente_id')
+    );
 
 
+    $pedidos = \App\Models\Pedido::with([
+        'detalles.producto'
+    ])
+    ->where(
+        'cliente_id',
+        $cliente->id
+    )
+    ->latest()
+    ->paginate(10);
+
+
+    return view(
+        'clientes.pedidos',
+        compact(
+            'cliente',
+            'pedidos'
+        )
+    );
+}
+
+public function compras()
+{
     $cliente = Cliente::with([
-
         'ventas.detalles.producto'
-
-    ])->find(
+    ])
+    ->find(
         session('cliente_id')
     );
 
 
     return view(
         'clientes.compras',
-        compact('cliente')
+        compact(
+            'cliente'
+        )
     );
-
 }
 
 
@@ -313,6 +331,26 @@ public function cambiarPassword(Request $request)
             );
 
     }
+
+    public function detallePedido(\App\Models\Pedido $pedido)
+{
+
+    if ($pedido->cliente_id != session('cliente_id')) {
+
+        abort(403);
+
+    }
+
+    $pedido->load([
+        'detalles.producto'
+    ]);
+
+    return view(
+        'clientes.detalle_pedido',
+        compact('pedido')
+    );
+
+}
 
 
 }

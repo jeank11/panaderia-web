@@ -108,6 +108,11 @@ Route::post(
 
 Route::middleware(['cliente'])->group(function () {
 
+    Route::get(
+    '/portal/pedido/{pedido}',
+    [ClienteAuthController::class, 'detallePedido']
+)->name('clientes.pedido.detalle');
+
 
     Route::get(
         '/portal/perfil',
@@ -115,6 +120,12 @@ Route::middleware(['cliente'])->group(function () {
     )->name('clientes.perfil');
 
     Route::get(
+    '/portal/pedidos',
+    [ClienteAuthController::class,'pedidos']
+)->name('clientes.pedidos');
+
+
+Route::get(
     '/portal/compras',
     [ClienteAuthController::class,'compras']
 )->name('clientes.compras');

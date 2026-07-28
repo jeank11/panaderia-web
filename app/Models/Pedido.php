@@ -39,4 +39,8 @@ class Pedido extends Model
     {
         return $this->hasMany(DetallePedido::class);
     }
+    public function venta()
+{
+    return $this->hasOne(Venta::class);
+}
 }

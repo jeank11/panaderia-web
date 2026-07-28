@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\Pedido;
 
 class Venta extends Model
 {
     protected $fillable = [
         'user_id',
         'cliente_id',
+        'pedido_id',
         'fecha',
         'total',
         'estado'
@@ -26,6 +28,11 @@ class Venta extends Model
     {
         return $this->belongsTo(Cliente::class);
     }
+
+    public function pedido()
+{
+    return $this->belongsTo(Pedido::class);
+}
 
 
     public function detalles()

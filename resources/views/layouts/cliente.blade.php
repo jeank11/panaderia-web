@@ -79,65 +79,104 @@
 
             <ul class="navbar-nav ms-auto">
 
-                <li class="nav-item">
-
-                    <a
-                        class="nav-link"
-                        href="{{ route('clientes.perfil') }}">
-
-                        Mi Perfil
-
-                    </a>
-
-                </li>
-
-                <li class="nav-item">
-
-                    <a
-                        class="nav-link"
-                        href="{{ route('clientes.compras') }}">
-
-                        Mis Compras
-
-                    </a>
-
-                </li>
-
-                <li class="nav-item">
+                <li class="nav-item dropdown">
 
     <a
-        class="nav-link"
-        href="{{ route('carrito.index') }}">
+        class="nav-link dropdown-toggle"
+        href="#"
+        role="button"
+        data-bs-toggle="dropdown">
 
-        🛒 Mi Carrito
+        👤 {{ $clientePortal->nombre }}
 
     </a>
 
+    <ul class="dropdown-menu dropdown-menu-end">
+
+        <li>
+
+            <a
+                class="dropdown-item"
+                href="{{ route('clientes.perfil') }}">
+
+                👤 Mi Perfil
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a
+                class="dropdown-item"
+                href="{{ route('clientes.pedidos') }}">
+
+                📦 Mis Pedidos
+
+            </a>
+
+        </li>
+         <li>
+
+           <a
+               class="dropdown-item"
+               href="{{ route('clientes.compras') }}">
+
+               📜 Mis Compras
+
+          </a>
+
+        </li>
+
+        <li>
+
+            <a
+                class="dropdown-item"
+                href="{{ route('carrito.index') }}">
+
+                🛒 Mi Carrito
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a
+                class="dropdown-item"
+                href="{{ route('clientes.password.form') }}">
+
+                🔑 Cambiar Contraseña
+
+            </a>
+
+        </li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <li>
+
+            <form
+                action="{{ route('clientes.logout') }}"
+                method="POST">
+
+                @csrf
+
+                <button
+                    type="submit"
+                    class="dropdown-item text-danger">
+
+                    🚪 Cerrar sesión
+
+                </button>
+
+            </form>
+
+        </li>
+
+    </ul>
+
 </li>
-
-                <li class="nav-item">
-
-                   <a
-    class="nav-link"
-    href="{{ route('clientes.password.form') }}">
-
-    Cambiar Contraseña
-
-</a>
-
-                </li>
-
-                <li class="nav-item">
-
-                    <a
-                        class="nav-link text-warning"
-                        href="{{ route('clientes.logout') }}">
-
-                        Cerrar Sesión
-
-                    </a>
-
-                </li>
 
             </ul>
 

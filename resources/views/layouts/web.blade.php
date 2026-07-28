@@ -155,31 +155,92 @@ href="{{ route('carrito.index') }}">
 
 @if(session()->has('cliente_id'))
 
-<li class="nav-item">
+<li class="nav-item dropdown">
 
     <a
-    class="nav-link"
-    href="{{ route('clientes.perfil') }}">
+        class="nav-link dropdown-toggle"
+        href="#"
+        role="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false">
 
-        👤 Mi Perfil
+        👤 {{ $clientePortal->nombre }}
 
     </a>
 
-</li>
+    <ul class="dropdown-menu dropdown-menu-end">
 
-<li class="nav-item">
+        <li>
 
-<li class="nav-item">
+            <a
+                class="dropdown-item"
+                href="{{ route('clientes.perfil') }}">
 
-    <a
-        href="{{ route('clientes.logout') }}"
-        class="btn btn-danger ms-3">
+                👤 Mi Perfil
 
-        🚪 Salir
+            </a>
 
-    </a>
+        </li>
 
-</li>
+        <li>
+
+            <a
+                class="dropdown-item"
+                href="{{ route('clientes.compras') }}">
+
+                📦 Mis Pedidos
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a
+                class="dropdown-item"
+                href="{{ route('carrito.index') }}">
+
+                🛒 Mi Carrito
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a
+                class="dropdown-item"
+                href="{{ route('clientes.password.form') }}">
+
+                🔑 Cambiar Contraseña
+
+            </a>
+
+        </li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <li>
+
+            <form
+                action="{{ route('clientes.logout') }}"
+                method="POST">
+
+                @csrf
+
+                <button
+                    type="submit"
+                    class="dropdown-item text-danger">
+
+                    🚪 Cerrar sesión
+
+                </button>
+
+            </form>
+
+        </li>
+
+    </ul>
 
 </li>
 
@@ -188,8 +249,8 @@ href="{{ route('carrito.index') }}">
 <li class="nav-item">
 
     <a
-    class="btn btn-warning ms-3"
-    href="{{ route('clientes.login') }}">
+        class="btn btn-warning ms-3"
+        href="{{ route('clientes.login') }}">
 
         Ingresar
 
@@ -198,7 +259,6 @@ href="{{ route('carrito.index') }}">
 </li>
 
 @endif
-
 </ul>
 
 </div>
