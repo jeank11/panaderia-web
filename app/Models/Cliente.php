@@ -20,7 +20,10 @@ class Cliente extends Authenticatable
         'password',
         'direccion',
         'fecha_nacimiento',
-        'estado'
+        'estado',
+        'permite_fiado',
+        'limite_credito'
+
     ];
 
 
@@ -39,8 +42,19 @@ class Cliente extends Authenticatable
     {
         return $this->hasMany(Venta::class);
     }
+    
     public function pedidos()
 {
     return $this->hasMany(Pedido::class);
+}
+public function getDeudaActualAttribute()
+{
+    return $this->ventas()
+        ->where('estado_pago', 'pendiente')
+        ->sum('saldo_pendiente');
+}
+public function getCreditoDisponibleAttribute()
+{
+    return $this->limite_credito - $this->deuda_actual;
 }
 }

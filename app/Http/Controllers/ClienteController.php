@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Cliente;
 
 class ClienteController extends Controller
 {
@@ -39,6 +40,8 @@ class ClienteController extends Controller
         'direccion' => 'nullable',
         'fecha_nacimiento' => 'nullable|date',
         'estado' => 'required|boolean',
+        'permite_fiado' => 'required|boolean',
+        'limite_credito' => 'required|numeric|min:0',
     ]);
 
     \App\Models\Cliente::create($request->all());
@@ -78,6 +81,8 @@ class ClienteController extends Controller
         'direccion' => 'nullable',
         'fecha_nacimiento' => 'nullable|date',
         'estado' => 'required|boolean',
+        'permite_fiado' => 'required|boolean',
+        'limite_credito' => 'required|numeric|min:0',
     ]);
 
     $cliente->update($request->all());
@@ -103,5 +108,16 @@ class ClienteController extends Controller
     return redirect()
             ->route('clientes.index')
             ->with('success', 'Estado del cliente actualizado correctamente.');
+}
+public function cuenta(Cliente $cliente)
+{
+    $ventas = $cliente->ventas()
+        ->where('estado_pago','pendiente')
+        ->get();
+
+    return view('clientes.cuenta', compact(
+        'cliente',
+        'ventas'
+    ));
 }
 }

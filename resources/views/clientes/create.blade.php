@@ -66,6 +66,46 @@
 
                 </div>
 
+                {{-- NUEVO --}}
+                <div class="col-md-3 mb-3">
+
+                    <label class="form-label">
+                        Permitir fiado
+                    </label>
+
+                    <select
+                        name="permite_fiado"
+                        class="form-select">
+
+                        <option value="0" selected>
+                            No
+                        </option>
+
+                        <option value="1">
+                            Sí
+                        </option>
+
+                    </select>
+
+                </div>
+
+                {{-- NUEVO --}}
+                <div class="col-md-3 mb-3">
+
+                    <label class="form-label">
+                        Límite de crédito
+                    </label>
+
+                    <input
+                        type="number"
+                        name="limite_credito"
+                        class="form-control"
+                        min="0"
+                        step="0.01"
+                        value="0">
+
+                </div>
+
             </div>
 
             <button class="btn btn-success">

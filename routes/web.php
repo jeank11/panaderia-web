@@ -15,6 +15,7 @@ use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\CarritoController;
 
 
+
 /*
 |--------------------------------------------------------------------------
 | Página pública
@@ -190,6 +191,7 @@ Route::post('/carrito/vaciar', [CarritoController::class, 'vaciar'])
 Route::middleware(['auth'])->group(function () {
 
     Route::resource('pedidos', PedidoController::class);
+    Route::resource('ventas', VentaController::class);
     Route::resource(
         'categorias',
         CategoriaController::class
@@ -275,6 +277,16 @@ Route::middleware(['auth'])->group(function () {
     'pedidos/{pedido}/estado',
     [PedidoController::class, 'cambiarEstado']
 )->name('pedidos.estado');
+
+// Rutas administrador
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/clientes/{cliente}/cuenta',
+        [ClienteController::class, 'cuenta'])
+        ->name('clientes.cuenta');
+
+});
 
 
 });

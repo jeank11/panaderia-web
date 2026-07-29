@@ -44,26 +44,46 @@ return view('ventas.create', compact('clientes', 'productos'));
      */
 public function store(Request $request)
 {
-    $request->validate([
-        'cliente_id' => 'required',
-        'productos' => 'required|array',
-        'total' => 'required'
-    ]);
+   $request->validate([
+    'cliente_id' => 'required',
+    'productos' => 'required|array',
+    'total' => 'required',
+    'tipo_pago' => 'required|in:contado,fiado'
+]);
+$cliente = \App\Models\Cliente::findOrFail($request->cliente_id);
+
+if ($request->tipo_pago == 'fiado' && !$cliente->permite_fiado) {
+
+    return response()->json([
+        'message' => 'Este cliente no está autorizado para comprar fiado.'
+    ], 422);
+
+}
 
 
     $venta = \App\Models\Venta::create([
 
-        'user_id' => auth()->id(),
+    'user_id' => auth()->id(),
 
-        'cliente_id' => $request->cliente_id,
+    'cliente_id' => $request->cliente_id,
 
-        'fecha' => now(),
+    'fecha' => now(),
 
-        'total' => $request->total,
+    'total' => $request->total,
 
-        'estado' => true
+    'tipo_pago' => $request->tipo_pago,
 
-    ]);
+    'estado_pago' => $request->tipo_pago == 'contado'
+                        ? 'pagada'
+                        : 'pendiente',
+
+    'saldo_pendiente' => $request->tipo_pago == 'contado'
+                        ? 0
+                        : $request->total,
+
+    'estado' => true
+
+]);
 
 
     foreach($request->productos as $producto)

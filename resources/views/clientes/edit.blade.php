@@ -70,6 +70,43 @@
                     </select>
 
                 </div>
+                <div class="col-md-3 mb-3">
+
+    <label class="form-label">
+        Permitir fiado
+    </label>
+
+    <select
+        name="permite_fiado"
+        class="form-select">
+
+        <option value="0" {{ !$cliente->permite_fiado ? 'selected' : '' }}>
+            No
+        </option>
+
+        <option value="1" {{ $cliente->permite_fiado ? 'selected' : '' }}>
+            Sí
+        </option>
+
+    </select>
+
+</div>
+
+<div class="col-md-3 mb-3">
+
+    <label class="form-label">
+        Límite de crédito
+    </label>
+
+    <input
+        type="number"
+        name="limite_credito"
+        class="form-control"
+        min="0"
+        step="0.01"
+        value="{{ $cliente->limite_credito }}">
+
+</div>
 
             </div>
 

@@ -181,18 +181,42 @@
 
         </table>
 
-        <div class="text-end">
+        <div class="row mt-4">
 
-            <h3>
+    <div class="col-md-6">
 
-    Total:
+        <label class="form-label">
+            <strong>Tipo de pago</strong>
+        </label>
 
-    $<span id="totalVenta">0.00</span>
+        <select
+            id="tipo_pago"
+            class="form-select">
 
-</h3>
+            <option value="contado" selected>
+                💵 Contado
+            </option>
 
-        </div>
-        <div class="text-end mt-3">
+            <option value="fiado">
+                📒 Fiado
+            </option>
+
+        </select>
+
+    </div>
+
+    <div class="col-md-6 text-end">
+
+        <h3 class="mt-4">
+            Total:
+            $<span id="totalVenta">0.00</span>
+        </h3>
+
+    </div>
+
+</div>
+
+<div class="text-end mt-4">
 
     <button
         type="button"
@@ -347,6 +371,8 @@ document.getElementById('guardarVenta')
 
     const cliente = document.getElementById('cliente').value;
 
+    const tipoPago = document.getElementById('tipo_pago').value;
+
     if(cliente === ''){
         alert('Seleccione un cliente');
         return;
@@ -357,7 +383,6 @@ document.getElementById('guardarVenta')
         return;
     }
 
-
     fetch('/ventas', {
 
         method: 'POST',
@@ -367,7 +392,7 @@ document.getElementById('guardarVenta')
             'Content-Type': 'application/json',
 
             'X-CSRF-TOKEN':
-            document.querySelector('meta[name="csrf-token"]').content
+                document.querySelector('meta[name="csrf-token"]').content
 
         },
 
@@ -377,21 +402,29 @@ document.getElementById('guardarVenta')
 
             productos: productosVenta,
 
-            total: total
+            total: total,
+
+            tipo_pago: tipoPago
 
         })
 
     })
-    .then(response => response.json())
+    .then(async response => {
 
-    .then(data => {
+        const data = await response.json();
 
         console.log(data);
+
+        if (!response.ok) {
+            alert(data.message ?? 'Ocurrió un error.');
+            return;
+        }
+
+        alert('Venta guardada correctamente');
 
     });
 
 });
-
 
 </script>
 

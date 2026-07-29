@@ -14,7 +14,10 @@ class Venta extends Model
         'pedido_id',
         'fecha',
         'total',
-        'estado'
+        'estado',
+        'tipo_pago',
+        'estado_pago',
+        'saldo_pendiente'
     ];
 
 
