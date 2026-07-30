@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Venta;
+use App\Models\PagoCliente;
 
 class Cliente extends Authenticatable
 {
@@ -50,11 +51,20 @@ class Cliente extends Authenticatable
 public function getDeudaActualAttribute()
 {
     return $this->ventas()
-        ->where('estado_pago', 'pendiente')
+        ->where('tipo_pago', 'fiado')
+        ->where('estado', true)
+        ->whereIn('estado_pago', [
+            'pendiente',
+            'parcial'
+        ])
         ->sum('saldo_pendiente');
 }
 public function getCreditoDisponibleAttribute()
 {
     return $this->limite_credito - $this->deuda_actual;
+}
+public function pagos()
+{
+    return $this->hasMany(PagoCliente::class);
 }
 }

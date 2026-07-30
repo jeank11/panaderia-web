@@ -24,52 +24,63 @@ class CarritoController extends Controller
     /**
      * Agregar producto
      */
-    public function agregar(Producto $producto)
-    {
-        $carrito = session()->get('carrito', []);
+    public function agregar(Request $request, Producto $producto)
+{
+    $cantidad = max(1, (int) $request->cantidad);
 
-        if (isset($carrito[$producto->id])) {
+    $carrito = session()->get('carrito', []);
 
-            if ($carrito[$producto->id]['cantidad'] < $producto->stock) {
+    if (isset($carrito[$producto->id])) {
 
-                $carrito[$producto->id]['cantidad']++;
+        $nuevaCantidad = $carrito[$producto->id]['cantidad'] + $cantidad;
 
-            } else {
+        if ($nuevaCantidad > $producto->stock) {
 
-                return back()->with(
-                    'error',
-                    'No hay más stock disponible.'
-                );
-
-            }
-
-        } else {
-
-            $carrito[$producto->id] = [
-
-                'id' => $producto->id,
-
-                'nombre' => $producto->nombre,
-
-                'precio' => $producto->precio_venta,
-
-                'cantidad' => 1,
-
-                'stock' => $producto->stock,
-
-                'imagen' => $producto->imagen
-
-            ];
+            return back()->with(
+                'error',
+                'No hay suficiente stock disponible.'
+            );
 
         }
 
-        session()->put('carrito', $carrito);
+        $carrito[$producto->id]['cantidad'] = $nuevaCantidad;
 
-        return back()->with(
-            'success',
-            'Producto agregado correctamente.'
-        );
+    } else {
+
+        if ($cantidad > $producto->stock) {
+
+            return back()->with(
+                'error',
+                'No hay suficiente stock disponible.'
+            );
+
+        }
+
+        $carrito[$producto->id] = [
+
+            'id' => $producto->id,
+
+            'nombre' => $producto->nombre,
+
+            'precio' => $producto->precio_venta,
+
+            'cantidad' => $cantidad,
+
+            'stock' => $producto->stock,
+
+            'imagen' => $producto->imagen
+
+        ];
+
     }
+
+    session()->put('carrito', $carrito);
+
+    return back()->with(
+        'success',
+        'Producto agregado correctamente.'
+    );
+}
 
     /**
      * Aumentar cantidad

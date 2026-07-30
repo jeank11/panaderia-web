@@ -2,9 +2,18 @@
 
 @section('contenido')
 
-<h2 class="mb-4">
-    📦 Mis Pedidos
-</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2 class="mb-0">
+        📦 Mis Pedidos
+    </h2>
+
+    <a href="{{ route('clientes.productos') }}"
+       class="btn btn-success">
+        🛍 Hacer un nuevo pedido
+    </a>
+
+</div>
 
 
 @if($pedidos->count())

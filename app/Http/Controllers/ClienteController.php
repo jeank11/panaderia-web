@@ -10,13 +10,21 @@ class ClienteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-         $clientes = \App\Models\Cliente::orderBy('apellido')
-                    ->paginate(10);
+   public function index()
+{
+    $clientes = \App\Models\Cliente::withSum([
+        'ventas as deuda_actual' => function($query){
+
+            $query->where('estado_pago','!=','pagada');
+
+        }
+    ], 'saldo_pendiente')
+    ->orderBy('apellido')
+    ->paginate(10);
+
 
     return view('clientes.index', compact('clientes'));
-    }
+}
 
     /**
      * Show the form for creating a new resource.
@@ -115,9 +123,16 @@ public function cuenta(Cliente $cliente)
         ->where('estado_pago','pendiente')
         ->get();
 
+
+    $pagos = $cliente->pagos()
+        ->orderBy('fecha','desc')
+        ->get();
+
+
     return view('clientes.cuenta', compact(
         'cliente',
-        'ventas'
+        'ventas',
+        'pagos'
     ));
 }
 }

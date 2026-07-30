@@ -401,15 +401,10 @@
     <div class="mt-4">
 
 
-        <a
-            href="{{ route('clientes.compras') }}"
-            class="btn btn-secondary">
-
-
-            ← Volver a Mis Pedidos
-
-
-        </a>
+        <a href="{{ route('clientes.pedidos') }}"
+   class="btn btn-secondary">
+    ← Volver a mis pedidos
+</a>
 
 
 

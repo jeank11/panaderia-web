@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Pedido;
+use App\Models\PagoCliente;
 
 class Venta extends Model
 {
@@ -42,4 +43,9 @@ class Venta extends Model
     {
         return $this->hasMany(DetalleVenta::class);
     }
+
+    public function pagos()
+{
+    return $this->hasMany(PagoCliente::class);
+}
 }

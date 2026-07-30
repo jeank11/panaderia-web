@@ -73,13 +73,40 @@ session([
                 'error',
                 'Correo o contraseña incorrectos.'
             );
-
+     
     }
+public function estadoCuenta()
+{
+    $cliente = \App\Models\Cliente::find(
+        session('cliente_id')
+    );
 
 
+    $ventas = $cliente->ventas()
+    ->with('detalles.producto')
+    ->where('tipo_pago', 'fiado')
+    ->where('estado', 1)
+    ->where('saldo_pendiente', '>', 0)
+    ->whereIn('estado_pago', ['pendiente', 'parcial'])
+    ->orderBy('fecha', 'desc')
+    ->get();
 
 
+    $deuda = $ventas->sum('saldo_pendiente');
 
+
+    $pagos = $cliente->pagos()
+        ->orderBy('fecha','desc')
+        ->get();
+
+
+    return view('clientes.estado_cuenta', compact(
+        'cliente',
+        'ventas',
+        'deuda',
+        'pagos'
+    ));
+}
     /**
      * Perfil del cliente
      */
@@ -150,7 +177,13 @@ public function pedidos()
 public function compras()
 {
     $cliente = Cliente::with([
-        'ventas.detalles.producto'
+        'ventas' => function($query){
+
+            $query->where('estado', true)
+                  ->with('detalles.producto')
+                  ->orderBy('fecha','desc');
+
+        }
     ])
     ->find(
         session('cliente_id')
@@ -350,6 +383,25 @@ public function cambiarPassword(Request $request)
         compact('pedido')
     );
 
+}
+public function productos()
+{
+    $cliente = \App\Models\Cliente::find(
+        session('cliente_id')
+    );
+
+    $productos = \App\Models\Producto::where('estado',1)
+        ->where('stock','>',0)
+        ->orderBy('nombre')
+        ->get();
+
+    return view(
+        'clientes.productos',
+        compact(
+            'cliente',
+            'productos'
+        )
+    );
 }
 
 

@@ -13,6 +13,7 @@ use App\Http\Controllers\ClienteRegistroController;
 use App\Http\Controllers\WebController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\CarritoController;
+use App\Http\Controllers\PagoClienteController;
 
 
 
@@ -178,6 +179,20 @@ Route::post('/carrito/eliminar/{producto}', [CarritoController::class, 'eliminar
 Route::post('/carrito/vaciar', [CarritoController::class, 'vaciar'])
     ->name('carrito.vaciar');
 
+Route::get(
+    '/portal/estado-cuenta',
+    [ClienteAuthController::class,'estadoCuenta']
+)->middleware('cliente')
+->name('clientes.estado_cuenta');
+
+Route::post(
+    '/clientes/{cliente}/pago-global',
+    [PagoClienteController::class,'pagoGlobal']
+)->name('clientes.pago.global');
+Route::get(
+    '/portal/productos',
+    [ClienteAuthController::class, 'productos']
+)->name('clientes.productos');
 
 
 /*
@@ -285,6 +300,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/clientes/{cliente}/cuenta',
         [ClienteController::class, 'cuenta'])
         ->name('clientes.cuenta');
+
+    Route::post('/clientes/{cliente}/pago',
+    [PagoClienteController::class, 'store'])
+    ->name('clientes.pago.store');
+    Route::post('/clientes/{cliente}/venta/{venta}/cancelar',
+    [PagoClienteController::class,'cancelar'])
+    ->name('clientes.pago.cancelar');
 
 });
 

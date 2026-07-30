@@ -127,18 +127,41 @@
           </a>
 
         </li>
+        <li>
+
+    <a
+        class="dropdown-item"
+        href="{{ route('clientes.estado_cuenta') }}">
+
+        📒 Estado de cuenta
+
+    </a>
+
+</li>
 
         <li>
 
-            <a
-                class="dropdown-item"
-                href="{{ route('carrito.index') }}">
+    <a
+        class="dropdown-item"
+        href="{{ route('clientes.productos') }}">
 
-                🛒 Mi Carrito
+        🛍 Comprar
 
-            </a>
+    </a>
 
-        </li>
+</li>
+
+<li>
+
+    <a
+        class="dropdown-item"
+        href="{{ route('carrito.index') }}">
+
+        🛒 Mi Carrito
+
+    </a>
+
+</li>
 
         <li>
 

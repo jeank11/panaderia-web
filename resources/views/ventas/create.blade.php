@@ -276,15 +276,23 @@ let existe = productosVenta.find(
 if (existe) {
 
     existe.cantidad += cant;
-    existe.subtotal = existe.cantidad * existe.precio;
+
+    existe.subtotal =
+        existe.cantidad * existe.precio;
+
 
 } else {
 
     productosVenta.push({
+
         producto_id: select.value,
+
         cantidad: cant,
+
         precio: precio,
+
         subtotal: subtotal
+
     });
 
 }
@@ -300,6 +308,8 @@ for (let fila of filas) {
         );
 
         cantidadActual += cant;
+        existe.cantidad = cantidadActual;
+        existe.subtotal = cantidadActual * precio;
 
         fila.children[1].innerText = cantidadActual;
 
@@ -308,10 +318,7 @@ for (let fila of filas) {
         fila.children[3].innerText =
             '$' + nuevoSubtotal.toFixed(2);
 
-        total += subtotal;
-
-        document.getElementById('totalVenta').innerText =
-            total.toFixed(2);
+        recalcularTotal();
 
         select.selectedIndex = 0;
         cantidad.value = 1;
@@ -336,30 +343,51 @@ for (let fila of filas) {
             <td>$${subtotal.toFixed(2)}</td>
             <td>
               <button 
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  onclick="eliminarProducto(this, ${subtotal})">
+    type="button"
+    class="btn btn-danger btn-sm"
+    onclick="eliminarProducto(this, ${select.value})">
 
-                Eliminar
+    Eliminar
 
-               </button>
+</button>
             </td>
         </tr>
     `;
 
-    total += subtotal;
-
-    document.getElementById('totalVenta').innerText = total.toFixed(2);
+    recalcularTotal();
 
     select.selectedIndex = 0;
     cantidad.value = 1;
 
 });
-function eliminarProducto(boton, subtotal)
+function eliminarProducto(boton, productoId)
 {
+
     boton.closest('tr').remove();
 
-    total -= subtotal;
+
+    productosVenta = productosVenta.filter(
+        producto => producto.producto_id != productoId
+    );
+
+
+    recalcularTotal();
+
+
+}
+
+function recalcularTotal()
+{
+
+    total = 0;
+
+
+    productosVenta.forEach(producto => {
+
+        total += producto.subtotal;
+
+    });
+
 
     document.getElementById('totalVenta').innerText =
         total.toFixed(2);
