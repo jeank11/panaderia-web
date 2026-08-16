@@ -14,6 +14,7 @@ use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\PagoClienteController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AdministradorController;
 
 
 /*
@@ -244,6 +245,23 @@ Route::get(
     '/dashboard',
     [DashboardController::class, 'index']
 )->name('dashboard');
+
+     /*
+|--------------------------------------------------------------------------
+| Administradores
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['admin'])->group(function () {
+
+    Route::resource(
+        'administradores',
+        AdministradorController::class
+    )->parameters([
+        'administradores' => 'administrador'
+    ]);
+
+});
 
     /*
     |--------------------------------------------------------------------------

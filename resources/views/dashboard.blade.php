@@ -2,6 +2,30 @@
 
 @section('contenido')
 
+<style>
+
+    .dashboard-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .dashboard-link .card {
+        transition: all 0.2s ease;
+    }
+
+    .dashboard-link:hover .card {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.12) !important;
+    }
+
+    .dashboard-link:hover {
+        color: inherit;
+    }
+
+</style>
+
+
 <h2 class="mb-4">
     📊 Dashboard
 </h2>
@@ -18,120 +42,136 @@
 
     <div class="col-md-3 mb-4">
 
-        <div class="card shadow-sm border-0 h-100">
+        <a href="{{ route('ventas.index') }}"
+           class="dashboard-link">
 
-            <div class="card-body">
+            <div class="card shadow-sm border-0 h-100">
 
-                <h6 class="text-muted">
-                    💰 Ventas Hoy
-                </h6>
+                <div class="card-body">
 
-                <h3 class="fw-bold text-success">
+                    <h6 class="text-muted">
+                        💰 Ventas Hoy
+                    </h6>
 
-                    ${{ number_format($ventasHoy, 2, ',', '.') }}
+                    <h3 class="fw-bold text-success">
 
-                </h3>
+                        ${{ number_format($ventasHoy, 2, ',', '.') }}
 
-                <small class="text-muted">
-                    Total vendido
-                </small>
+                    </h3>
+
+                    <small class="text-muted">
+                        Ver todas las ventas →
+                    </small>
+
+                </div>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
-
 
 
     {{-- CONTADO --}}
 
     <div class="col-md-3 mb-4">
 
-        <div class="card shadow-sm border-0 h-100">
+        <a href="{{ route('ventas.index') }}"
+           class="dashboard-link">
 
-            <div class="card-body">
+            <div class="card shadow-sm border-0 h-100">
 
-                <h6 class="text-muted">
-                    💵 Contado
-                </h6>
+                <div class="card-body">
 
-                <h3 class="fw-bold">
+                    <h6 class="text-muted">
+                        💵 Contado
+                    </h6>
 
-                    ${{ number_format($ventasContadoHoy, 2, ',', '.') }}
+                    <h3 class="fw-bold">
 
-                </h3>
+                        ${{ number_format($ventasContadoHoy, 2, ',', '.') }}
 
-                <small class="text-muted">
-                    Ventas al contado de hoy
-                </small>
+                    </h3>
+
+                    <small class="text-muted">
+                        Ventas al contado →
+                    </small>
+
+                </div>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
-
 
 
     {{-- FIADO --}}
 
     <div class="col-md-3 mb-4">
 
-        <div class="card shadow-sm border-0 h-100">
+        <a href="{{ route('ventas.index') }}"
+           class="dashboard-link">
 
-            <div class="card-body">
+            <div class="card shadow-sm border-0 h-100">
 
-                <h6 class="text-muted">
-                    📒 Fiado
-                </h6>
+                <div class="card-body">
 
-                <h3 class="fw-bold text-warning">
+                    <h6 class="text-muted">
+                        📒 Fiado
+                    </h6>
 
-                    ${{ number_format($ventasFiadoHoy, 2, ',', '.') }}
+                    <h3 class="fw-bold text-warning">
 
-                </h3>
+                        ${{ number_format($ventasFiadoHoy, 2, ',', '.') }}
 
-                <small class="text-muted">
-                    Ventas fiadas de hoy
-                </small>
+                    </h3>
+
+                    <small class="text-muted">
+                        Ventas fiadas →
+                    </small>
+
+                </div>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
-
 
 
     {{-- SALDO PENDIENTE --}}
 
     <div class="col-md-3 mb-4">
 
-        <div class="card shadow-sm border-0 h-100">
+        <a href="{{ route('clientes.index') }}"
+           class="dashboard-link">
 
-            <div class="card-body">
+            <div class="card shadow-sm border-0 h-100">
 
-                <h6 class="text-muted">
-                    💳 Saldo Pendiente
-                </h6>
+                <div class="card-body">
 
-                <h3 class="fw-bold text-danger">
+                    <h6 class="text-muted">
+                        💳 Saldo Pendiente
+                    </h6>
 
-                    ${{ number_format($saldoPendiente, 2, ',', '.') }}
+                    <h3 class="fw-bold text-danger">
 
-                </h3>
+                        ${{ number_format($saldoPendiente, 2, ',', '.') }}
 
-                <small class="text-muted">
-                    Total por cobrar
-                </small>
+                    </h3>
+
+                    <small class="text-muted">
+                        Ver clientes →
+                    </small>
+
+                </div>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
-
 
 </div>
 
@@ -148,87 +188,134 @@
 
     <div class="col-md-3 mb-4">
 
-        <div class="card shadow-sm border-0">
+        <a href="{{ route('productos.index') }}"
+           class="dashboard-link">
 
-            <div class="card-body">
+            <div class="card shadow-sm border-0">
 
-                <h6 class="text-muted">
-                    📦 Productos
-                </h6>
+                <div class="card-body">
 
-                <h3 class="fw-bold">
+                    <h6 class="text-muted">
+                        📦 Productos
+                    </h6>
 
-                    {{ $cantidadProductos }}
+                    <h3 class="fw-bold">
 
-                </h3>
+                        {{ $cantidadProductos }}
 
-                <small class="text-muted">
-                    Productos activos
-                </small>
+                    </h3>
+
+                    <small class="text-muted">
+                        Ver productos →
+                    </small>
+
+                </div>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
-
 
 
     {{-- CLIENTES --}}
 
     <div class="col-md-3 mb-4">
 
-        <div class="card shadow-sm border-0">
+        <a href="{{ route('clientes.index') }}"
+           class="dashboard-link">
 
-            <div class="card-body">
+            <div class="card shadow-sm border-0">
 
-                <h6 class="text-muted">
-                    👥 Clientes
-                </h6>
+                <div class="card-body">
 
-                <h3 class="fw-bold">
+                    <h6 class="text-muted">
+                        👥 Clientes
+                    </h6>
 
-                    {{ $cantidadClientes }}
+                    <h3 class="fw-bold">
 
-                </h3>
+                        {{ $cantidadClientes }}
 
-                <small class="text-muted">
-                    Clientes activos
-                </small>
+                    </h3>
+
+                    <small class="text-muted">
+                        Ver clientes →
+                    </small>
+
+                </div>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
-
 
 
     {{-- STOCK BAJO --}}
 
     <div class="col-md-3 mb-4">
 
-        <div class="card shadow-sm border-0">
+        <a href="{{ route('productos.index') }}"
+           class="dashboard-link">
 
-            <div class="card-body">
+            <div class="card shadow-sm border-0">
 
-                <h6 class="text-muted">
-                    ⚠️ Stock Bajo
-                </h6>
+                <div class="card-body">
 
-                <h3 class="fw-bold text-danger">
+                    <h6 class="text-muted">
+                        ⚠️ Stock Bajo
+                    </h6>
 
-                    {{ $productosStockBajo }}
+                    <h3 class="fw-bold text-danger">
 
-                </h3>
+                        {{ $productosStockBajo }}
 
-                <small class="text-muted">
-                    Productos para reponer
-                </small>
+                    </h3>
+
+                    <small class="text-muted">
+                        Revisar productos →
+                    </small>
+
+                </div>
 
             </div>
 
-        </div>
+        </a>
+
+    </div>
+
+
+    {{-- PEDIDOS --}}
+
+    <div class="col-md-3 mb-4">
+
+        <a href="{{ route('pedidos.index') }}"
+           class="dashboard-link">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        📦 Pedidos
+                    </h6>
+
+                    <h3 class="fw-bold">
+
+                        {{ $pedidosPendientes }}
+
+                    </h3>
+
+                    <small class="text-muted">
+                        Pedidos pendientes →
+                    </small>
+
+                </div>
+
+            </div>
+
+        </a>
 
     </div>
 
@@ -238,7 +325,7 @@
 
 
 {{-- ===================================================== --}}
-{{-- PEDIDOS --}}
+{{-- ESTADO DE PEDIDOS --}}
 {{-- ===================================================== --}}
 
 <h4 class="mt-3 mb-3">
@@ -249,121 +336,156 @@
 <div class="row">
 
 
-    {{-- PENDIENTES --}}
-
     <div class="col-md mb-3">
 
-        <div class="card border-warning shadow-sm">
+        <a href="{{ route('pedidos.index') }}"
+           class="dashboard-link">
 
-            <div class="card-body text-center">
+            <div class="card border-warning shadow-sm">
 
-                <h6>
-                    🟡 Pendientes
-                </h6>
+                <div class="card-body text-center">
 
-                <h3>
-                    {{ $pedidosPendientes }}
-                </h3>
+                    <h6>
+                        🟡 Pendientes
+                    </h6>
+
+                    <h3>
+                        {{ $pedidosPendientes }}
+                    </h3>
+
+                    <small class="text-muted">
+                        Ver pedidos →
+                    </small>
+
+                </div>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
 
 
 
-    {{-- PREPARANDO --}}
-
     <div class="col-md mb-3">
 
-        <div class="card border-info shadow-sm">
+        <a href="{{ route('pedidos.index') }}"
+           class="dashboard-link">
 
-            <div class="card-body text-center">
+            <div class="card border-info shadow-sm">
 
-                <h6>
-                    🔵 Preparando
-                </h6>
+                <div class="card-body text-center">
 
-                <h3>
-                    {{ $pedidosPreparando }}
-                </h3>
+                    <h6>
+                        🔵 Preparando
+                    </h6>
+
+                    <h3>
+                        {{ $pedidosPreparando }}
+                    </h3>
+
+                    <small class="text-muted">
+                        Ver pedidos →
+                    </small>
+
+                </div>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
 
 
 
-    {{-- LISTOS --}}
-
     <div class="col-md mb-3">
 
-        <div class="card border-success shadow-sm">
+        <a href="{{ route('pedidos.index') }}"
+           class="dashboard-link">
 
-            <div class="card-body text-center">
+            <div class="card border-success shadow-sm">
 
-                <h6>
-                    🟢 Listos
-                </h6>
+                <div class="card-body text-center">
 
-                <h3>
-                    {{ $pedidosListos }}
-                </h3>
+                    <h6>
+                        🟢 Listos
+                    </h6>
+
+                    <h3>
+                        {{ $pedidosListos }}
+                    </h3>
+
+                    <small class="text-muted">
+                        Ver pedidos →
+                    </small>
+
+                </div>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
 
 
 
-    {{-- ENTREGADOS --}}
-
     <div class="col-md mb-3">
 
-        <div class="card border-success shadow-sm">
+        <a href="{{ route('pedidos.index') }}"
+           class="dashboard-link">
 
-            <div class="card-body text-center">
+            <div class="card border-success shadow-sm">
 
-                <h6>
-                    ✅ Entregados
-                </h6>
+                <div class="card-body text-center">
 
-                <h3>
-                    {{ $pedidosEntregados }}
-                </h3>
+                    <h6>
+                        ✅ Entregados
+                    </h6>
+
+                    <h3>
+                        {{ $pedidosEntregados }}
+                    </h3>
+
+                    <small class="text-muted">
+                        Ver pedidos →
+                    </small>
+
+                </div>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
 
 
 
-    {{-- CANCELADOS --}}
-
     <div class="col-md mb-3">
 
-        <div class="card border-danger shadow-sm">
+        <a href="{{ route('pedidos.index') }}"
+           class="dashboard-link">
 
-            <div class="card-body text-center">
+            <div class="card border-danger shadow-sm">
 
-                <h6>
-                    🔴 Cancelados
-                </h6>
+                <div class="card-body text-center">
 
-                <h3>
-                    {{ $pedidosCancelados }}
-                </h3>
+                    <h6>
+                        🔴 Cancelados
+                    </h6>
+
+                    <h3>
+                        {{ $pedidosCancelados }}
+                    </h3>
+
+                    <small class="text-muted">
+                        Ver pedidos →
+                    </small>
+
+                </div>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
 
@@ -373,11 +495,13 @@
 
 
 {{-- ===================================================== --}}
-{{-- STOCK BAJO --}}
+{{-- STOCK BAJO + ÚLTIMAS VENTAS --}}
 {{-- ===================================================== --}}
 
 <div class="row mt-4">
 
+
+    {{-- STOCK BAJO --}}
 
     <div class="col-md-6">
 
@@ -419,21 +543,31 @@
 
                     <tbody>
 
-
                     @forelse($stockBajo as $producto)
 
                         <tr>
 
                             <td>
-                                {{ $producto->nombre }}
+
+                                <a href="{{ route('productos.show', $producto) }}"
+                                   class="text-decoration-none">
+
+                                    {{ $producto->nombre }}
+
+                                </a>
+
                             </td>
 
                             <td class="text-danger fw-bold">
+
                                 {{ $producto->stock }}
+
                             </td>
 
                             <td>
+
                                 {{ $producto->stock_minimo }}
+
                             </td>
 
                         </tr>
@@ -442,8 +576,7 @@
 
                         <tr>
 
-                            <td
-                                colspan="3"
+                            <td colspan="3"
                                 class="text-center">
 
                                 ✅ No hay productos con stock bajo.
@@ -453,7 +586,6 @@
                         </tr>
 
                     @endforelse
-
 
                     </tbody>
 
@@ -467,10 +599,7 @@
 
 
 
-    {{-- ================================================= --}}
     {{-- ÚLTIMAS VENTAS --}}
-    {{-- ================================================= --}}
-
 
     <div class="col-md-6">
 
@@ -516,21 +645,30 @@
 
                     <tbody>
 
-
                     @forelse($ultimasVentas as $venta)
 
                         <tr>
 
                             <td>
 
-                                {{ \Carbon\Carbon::parse($venta->fecha)->format('d/m H:i') }}
+                                <a href="{{ route('ventas.show', $venta) }}"
+                                   class="text-decoration-none">
+
+                                    {{ \Carbon\Carbon::parse($venta->fecha)->format('d/m H:i') }}
+
+                                </a>
 
                             </td>
 
 
                             <td>
 
-                                {{ $venta->cliente->nombre_completo }}
+                                <a href="{{ route('clientes.show', $venta->cliente) }}"
+                                   class="text-decoration-none">
+
+                                    {{ $venta->cliente->nombre_completo }}
+
+                                </a>
 
                             </td>
 
@@ -566,8 +704,7 @@
 
                         <tr>
 
-                            <td
-                                colspan="4"
+                            <td colspan="4"
                                 class="text-center">
 
                                 No existen ventas.
@@ -577,7 +714,6 @@
                         </tr>
 
                     @endforelse
-
 
                     </tbody>
 
@@ -652,14 +788,24 @@
 
                     <td>
 
-                        {{ $pedido->codigo }}
+                        <a href="{{ route('pedidos.show', $pedido) }}"
+                           class="text-decoration-none fw-bold">
+
+                            {{ $pedido->codigo }}
+
+                        </a>
 
                     </td>
 
 
                     <td>
 
-                        {{ $pedido->cliente->nombre_completo }}
+                        <a href="{{ route('clientes.show', $pedido->cliente) }}"
+                           class="text-decoration-none">
+
+                            {{ $pedido->cliente->nombre_completo }}
+
+                        </a>
 
                     </td>
 
@@ -679,7 +825,6 @@
 
 
                     <td>
-
 
                         @if($pedido->estado == 'Pendiente')
 
@@ -719,7 +864,6 @@
 
                         @endif
 
-
                     </td>
 
                 </tr>
@@ -729,8 +873,7 @@
 
                 <tr>
 
-                    <td
-                        colspan="5"
+                    <td colspan="5"
                         class="text-center">
 
                         No existen pedidos.

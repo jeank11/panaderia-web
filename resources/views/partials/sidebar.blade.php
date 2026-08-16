@@ -4,31 +4,64 @@
         🥖 PanaEcheveste
     </h4>
 
-    <a href="{{ route('dashboard') }}">🏠 Dashboard</a>
+
+    {{-- MENÚ PRINCIPAL --}}
+
+    <a href="{{ route('dashboard') }}">
+        🏠 Dashboard
+    </a>
+
 
     <a href="{{ route('categorias.index') }}">
         📂 Categorías
     </a>
 
+
     <a href="{{ route('productos.index') }}">
         🥖 Productos
     </a>
+
 
     <a href="{{ route('clientes.index') }}">
         👥 Clientes
     </a>
 
+
     <a href="#">
         🚚 Proveedores
     </a>
 
-    <a href="{{ route('pedidos.index') }}">
 
+    <a href="{{ route('pedidos.index') }}">
         📦 Pedidos
     </a>
+
 
     <a href="{{ route('ventas.index') }}">
         🛒 Ventas
     </a>
+
+
+    {{-- MENÚ ADMINISTRADOR --}}
+
+    @auth
+
+        @if(auth()->user()->role === 'administrador')
+
+            <hr class="border-light my-3">
+
+            <div class="text-white small mb-2">
+                ⚙️ ADMINISTRACIÓN
+            </div>
+
+
+            <a href="{{ route('administradores.index') }}">
+                👤 Administradores
+            </a>
+
+
+        @endif
+
+    @endauth
 
 </div>
