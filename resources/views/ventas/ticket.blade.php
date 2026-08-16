@@ -3,199 +3,247 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <title>Ticket Venta #{{ $venta->id }}</title>
+<title>Ticket Venta #{{ $venta->id }}</title>
 
+<style>
 
-    <style>
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    width:320px;
+    margin:auto;
+    font-size:13px;
+    color:#000;
+}
 
-        body{
-            font-family: Arial, sans-serif;
-            width: 300px;
-            margin: auto;
-            font-size: 14px;
-        }
+h2,h3,p{
+    margin:0;
+}
 
+.center{
+    text-align:center;
+}
 
-        .text-center{
-            text-align:center;
-        }
+.right{
+    text-align:right;
+}
 
+.linea{
+    border-top:1px dashed #000;
+    margin:10px 0;
+}
 
-        .linea{
-            border-top:1px dashed #000;
-            margin:10px 0;
-        }
+table{
+    width:100%;
+    border-collapse:collapse;
+}
 
+th{
+    text-align:left;
+    border-bottom:1px solid #000;
+    padding-bottom:4px;
+}
 
-        table{
-            width:100%;
-            border-collapse:collapse;
-        }
+td{
+    padding:4px 0;
+    vertical-align:top;
+}
 
+.total{
+    font-size:18px;
+    font-weight:bold;
+}
 
-        td{
-            padding:5px 0;
-        }
+.info p{
+    margin:2px 0;
+}
 
+@media print{
 
-        .total{
+    button{
+        display:none;
+    }
 
-            font-size:18px;
-            font-weight:bold;
-            text-align:right;
+}
 
-        }
-
-
-        @media print {
-
-            button{
-                display:none;
-            }
-
-        }
-
-    </style>
+</style>
 
 </head>
 
-
 <body>
 
+<div class="center">
 
-<div class="text-center">
+<h2>🥖 PanaEcheveste</h2>
 
-    <h2>
-        🥖 PanaEcheveste
-    </h2>
+<p>Panadería Artesanal</p>
 
-    <p>
-        Panadería Artesanal
-    </p>
-
+<p>Ticket de Venta</p>
 
 </div>
 
-
 <div class="linea"></div>
 
+<div class="info">
 
-<p>
-<strong>Venta Nº:</strong>
-{{ $venta->id }}
-</p>
+<p><strong>Ticket:</strong> {{ str_pad($venta->id,6,'0',STR_PAD_LEFT) }}</p>
 
-
-<p>
-<strong>Fecha:</strong>
+<p><strong>Fecha:</strong>
 {{ \Carbon\Carbon::parse($venta->fecha)->format('d/m/Y H:i') }}
 </p>
 
-
-<p>
-<strong>Cliente:</strong>
+<p><strong>Cliente:</strong>
 {{ $venta->cliente->nombre_completo }}
 </p>
 
+@if($venta->cliente->documento)
 
-<p>
-<strong>Atendido por:</strong>
+<p><strong>Documento:</strong>
+{{ $venta->cliente->documento }}
+</p>
+
+@endif
+
+<p><strong>Vendedor:</strong>
 {{ $venta->usuario->name }}
 </p>
 
+<p><strong>Pago:</strong>
+{{ ucfirst($venta->tipo_pago) }}
+</p>
+
+<p><strong>Estado:</strong>
+{{ ucfirst($venta->estado_pago) }}
+</p>
+
+</div>
 
 <div class="linea"></div>
 
-
 <table>
 
+<thead>
+
+<tr>
+
+<th>Producto</th>
+
+<th class="right">Cant.</th>
+
+<th class="right">Subt.</th>
+
+</tr>
+
+</thead>
+
+<tbody>
 
 @foreach($venta->detalles as $detalle)
 
 <tr>
 
-    <td>
-        {{ $detalle->producto->nombre }}
-    </td>
+<td>
 
-
-    <td style="text-align:right">
-
-        {{ $detalle->cantidad }}
-
-    </td>
-
-
-</tr>
-
-
-<tr>
-
-    <td>
-        ${{ number_format($detalle->precio,2) }}
-    </td>
-
-
-    <td style="text-align:right">
-
-        ${{ number_format($detalle->subtotal,2) }}
-
-    </td>
-
-
-</tr>
-
-
-@endforeach
-
-
-</table>
-
-
-<div class="linea"></div>
-
-
-<p class="total">
-
-TOTAL:
-${{ number_format($venta->total,2) }}
-
-</p>
-
-
-<div class="linea"></div>
-
-
-<div class="text-center">
-
-<p>
-¡Gracias por su compra!
-</p>
-
-<p>
-Vuelva pronto 😊
-</p>
-
-
-</div>
-
+{{ $detalle->producto->nombre }}
 
 <br>
 
+<small>
 
-<div class="text-center">
+$ {{ number_format($detalle->precio,2) }} c/u
 
-<button onclick="window.print()">
+</small>
 
-    🖨 Imprimir
+</td>
 
-</button>
+<td class="right">
 
+{{ $detalle->cantidad }}
+
+</td>
+
+<td class="right">
+
+${{ number_format($detalle->subtotal,2) }}
+
+</td>
+
+</tr>
+
+@endforeach
+
+</tbody>
+
+</table>
+
+<div class="linea"></div>
+
+<table>
+
+<tr>
+
+<td><strong>Total</strong></td>
+
+<td class="right total">
+
+${{ number_format($venta->total,2) }}
+
+</td>
+
+</tr>
+
+@if($venta->saldo_pendiente > 0)
+
+<tr>
+
+<td>
+
+<strong>Saldo pendiente</strong>
+
+</td>
+
+<td class="right">
+
+${{ number_format($venta->saldo_pendiente,2) }}
+
+</td>
+
+</tr>
+
+@endif
+
+</table>
+
+<div class="linea"></div>
+
+<div class="center">
+
+<p>
+
+¡Gracias por elegirnos!
+
+</p>
+
+<p>
+
+Lo esperamos nuevamente 😊
+
+</p>
 
 </div>
 
+<br>
+
+<div class="center">
+
+<button onclick="window.print()">
+
+🖨 Imprimir
+
+</button>
+
+</div>
 
 </body>
 

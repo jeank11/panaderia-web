@@ -10,17 +10,122 @@ class VentaController extends Controller
     /**
      * Display a listing of the resource.
      */
-  public function index()
+ public function index(Request $request)
 {
-    $ventas = \App\Models\Venta::with([
+    // Consulta base
+    $consulta = Venta::with([
         'cliente',
         'usuario'
-    ])
-    ->orderBy('id','desc')
-    ->paginate(10);
+    ]);
 
 
-    return view('ventas.index', compact('ventas'));
+    // BUSCAR CLIENTE
+    if ($request->filled('buscar')) {
+
+        $buscar = $request->buscar;
+
+        $consulta->whereHas('cliente', function ($query) use ($buscar) {
+
+            $query->where('nombre', 'like', '%' . $buscar . '%')
+                  ->orWhere('apellido', 'like', '%' . $buscar . '%')
+                  ->orWhere('documento', 'like', '%' . $buscar . '%');
+
+        });
+
+    }
+
+
+    // FILTRO TIPO DE PAGO
+    if ($request->filled('tipo_pago')) {
+
+        $consulta->where(
+            'tipo_pago',
+            $request->tipo_pago
+        );
+
+    }
+
+
+    // FILTRO ESTADO DE PAGO
+    if ($request->filled('estado_pago')) {
+
+        $consulta->where(
+            'estado_pago',
+            $request->estado_pago
+        );
+
+    }
+
+
+    // FECHA DESDE
+    if ($request->filled('fecha_desde')) {
+
+        $consulta->whereDate(
+            'fecha',
+            '>=',
+            $request->fecha_desde
+        );
+
+    }
+
+
+    // FECHA HASTA
+    if ($request->filled('fecha_hasta')) {
+
+        $consulta->whereDate(
+            'fecha',
+            '<=',
+            $request->fecha_hasta
+        );
+
+    }
+
+
+    // Ventas para la tabla
+    $ventas = $consulta
+        ->orderBy('id', 'desc')
+        ->paginate(10)
+        ->withQueryString();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TOTALES
+    |--------------------------------------------------------------------------
+    |
+    | Clonamos la consulta para que los totales respeten
+    | los filtros seleccionados.
+    |
+    */
+
+    $consultaTotales = clone $consulta;
+
+
+    // Solamente ventas activas participan en los totales
+    $consultaTotales->where('estado', true);
+
+
+    $totalContado = (clone $consultaTotales)
+        ->where('tipo_pago', 'contado')
+        ->sum('total');
+
+
+    $totalFiado = (clone $consultaTotales)
+        ->where('tipo_pago', 'fiado')
+        ->sum('total');
+
+
+    $totalPendiente = (clone $consultaTotales)
+        ->where('tipo_pago', 'fiado')
+        ->sum('saldo_pendiente');
+
+
+    return view('ventas.index', compact(
+        'ventas',
+        'totalContado',
+        'totalFiado',
+        'totalPendiente'
+    ));
 }
 
     /**
@@ -67,7 +172,7 @@ if ($request->tipo_pago == 'fiado' && !$cliente->permite_fiado) {
 
     'cliente_id' => $request->cliente_id,
 
-    'fecha' => now(),
+    'fecha' => $request->fecha,
 
     'total' => $request->total,
 
@@ -216,5 +321,15 @@ public function anular(Venta $venta)
         ->route('ventas.index')
         ->with('success','Venta anulada correctamente y stock devuelto.');
 
+}
+
+public function detalle(Venta $venta)
+{
+    $venta->load([
+        'cliente',
+        'detalles.producto'
+    ]);
+
+    return response()->json($venta);
 }
 }

@@ -6,229 +6,269 @@
     Productos
 </h2>
 
-
 @if(session('success'))
-
 <div class="alert alert-success">
-
     {{ session('success') }}
+</div>
+@endif
 
+<a href="{{ route('productos.create') }}" class="btn btn-success mb-3">
+    Nuevo producto
+</a>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+
+        <form method="GET" action="{{ route('productos.index') }}">
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Buscar</label>
+
+                    <input
+                        type="text"
+                        name="buscar"
+                        class="form-control"
+                        placeholder="Código o nombre..."
+                        value="{{ request('buscar') }}">
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Categoría</label>
+
+                    <select name="categoria" class="form-select">
+
+                        <option value="">Todas</option>
+
+                        @foreach($categorias as $categoria)
+
+                            <option
+                                value="{{ $categoria->id }}"
+                                @selected(request('categoria') == $categoria->id)>
+
+                                {{ $categoria->nombre }}
+
+                            </option>
+
+                        @endforeach
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+
+                    <label class="form-label">Estado</label>
+
+                    <select name="estado" class="form-select">
+
+                        <option value="">Todos</option>
+
+                        <option value="1" @selected(request('estado') === '1')>
+                            Activos
+                        </option>
+
+                        <option value="0" @selected(request('estado') === '0')>
+                            Inactivos
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-2 mb-3 d-flex align-items-end gap-2">
+
+                    <button class="btn btn-primary w-100">
+                        Buscar
+                    </button>
+
+                    <a href="{{ route('productos.index') }}"
+                       class="btn btn-secondary">
+                        Limpiar
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
 </div>
 
-@endif
+<div class="table-responsive">
 
+<table class="table table-bordered table-hover align-middle bg-white">
 
+    <thead class="table-dark text-center">
 
-<a href="{{ route('productos.create') }}"
-   class="btn btn-success mb-3">
+        <tr>
 
-    Nuevo producto
+            <th>Imagen</th>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Precio Venta</th>
+            <th>Stock</th>
+            <th>Estado</th>
+            <th width="180">Acciones</th>
 
-</a>
+        </tr>
 
+    </thead>
 
+    <tbody>
 
-<table class="table table-bordered table-hover bg-white">
+    @forelse($productos as $producto)
 
-<thead class="table-dark">
+        <tr>
 
-<tr>
+            <td class="text-center">
 
-    <th>Imagen</th>
-    <th>Código</th>
-    <th>Nombre</th>
-    <th>Categoría</th>
-    <th>Precio Venta</th>
-    <th>Stock</th>
-    <th>Estado</th>
-    <th width="180">
-        Acciones
-    </th>
+                @if($producto->imagen)
 
-</tr>
+                    <img
+                        src="{{ asset('storage/'.$producto->imagen) }}"
+                        width="60"
+                        height="60"
+                        class="rounded shadow-sm"
+                        style="object-fit: cover;">
 
-</thead>
+                @else
 
+                    <span class="text-muted">
+                        Sin imagen
+                    </span>
 
+                @endif
 
-<tbody>
+            </td>
 
+            <td class="text-center">
 
-@forelse($productos as $producto)
+                <span class="badge bg-secondary">
+                    {{ $producto->codigo }}
+                </span>
 
+            </td>
 
-<tr>
+            <td>
+                {{ $producto->nombre }}
+            </td>
 
+            <td>
+                {{ $producto->categoria->nombre }}
+            </td>
 
-<td>
+            <td class="text-end">
 
-@if($producto->imagen)
+                <span class="fw-bold text-success">
+                    ${{ number_format($producto->precio_venta,2) }}
+                </span>
 
-<img
-src="{{ asset('storage/'.$producto->imagen) }}"
-width="70"
-height="70"
-style="object-fit:cover"
-class="rounded">
+            </td>
 
-@else
+            <td class="text-center">
 
-<span class="text-muted">
+                @if($producto->stock == 0)
 
-Sin imagen
+                    <span class="badge bg-danger">
+                        {{ $producto->stock }}
+                    </span>
 
-</span>
+                @elseif($producto->stock <= $producto->stock_minimo)
 
-@endif
+                    <span class="badge bg-warning text-dark">
+                        {{ $producto->stock }}
+                    </span>
 
+                @else
 
-</td>
+                    <span class="badge bg-success">
+                        {{ $producto->stock }}
+                    </span>
 
+                @endif
 
+            </td>
 
-<td>
+            <td class="text-center">
 
-{{ $producto->codigo }}
+                @if($producto->estado)
 
-</td>
+                    <span class="badge bg-success">
+                        Activo
+                    </span>
 
+                @else
 
+                    <span class="badge bg-danger">
+                        Inactivo
+                    </span>
 
-<td>
+                @endif
 
-{{ $producto->nombre }}
+            </td>
 
-</td>
+            <td class="text-center">
 
+                <a href="{{ route('productos.edit',$producto) }}"
+                   class="btn btn-primary btn-sm">
+                    Editar
+                </a>
 
+                <form action="{{ route('productos.estado',$producto) }}"
+                      method="POST"
+                      class="d-inline">
 
-<td>
+                    @csrf
+                    @method('PATCH')
 
-{{ $producto->categoria->nombre }}
+                    <button class="btn btn-warning btn-sm">
 
-</td>
+                        @if($producto->estado)
 
+                            Desactivar
 
+                        @else
 
-<td>
+                            Activar
 
-${{ number_format($producto->precio_venta,2) }}
+                        @endif
 
-</td>
+                    </button>
 
+                </form>
 
+            </td>
 
-<td>
+        </tr>
 
-{{ $producto->stock }}
+    @empty
 
-</td>
+        <tr>
 
+            <td colspan="8" class="text-center py-4">
 
+                No existen productos registrados.
 
-<td>
+            </td>
 
+        </tr>
 
-@if($producto->estado)
+    @endforelse
 
-<span class="badge bg-success">
-
-Activo
-
-</span>
-
-
-@else
-
-<span class="badge bg-danger">
-
-Inactivo
-
-</span>
-
-
-@endif
-
-
-</td>
-
-
-
-
-<td>
-
-
-<a href="{{ route('productos.edit',$producto) }}"
-   class="btn btn-primary btn-sm">
-
-    Editar
-
-</a>
-
-
-
-<form action="{{ route('productos.estado',$producto) }}"
-      method="POST"
-      style="display:inline">
-
-@csrf
-
-@method('PATCH')
-
-
-<button class="btn btn-warning btn-sm">
-
-@if($producto->estado)
-
-Desactivar
-
-@else
-
-Activar
-
-@endif
-
-</button>
-
-
-</form>
-
-
-</td>
-
-
-</tr>
-
-
-
-@empty
-
-
-<tr>
-
-<td colspan="8"
-class="text-center">
-
-No existen productos registrados.
-
-</td>
-
-</tr>
-
-
-@endforelse
-
-
-
-</tbody>
-
+    </tbody>
 
 </table>
 
+</div>
 
+<div class="mt-3">
 
-{{ $productos->links() }}
+    {{ $productos->links() }}
 
-
+</div>
 
 @endsection

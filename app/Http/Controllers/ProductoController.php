@@ -10,14 +10,44 @@ use Illuminate\Support\Facades\Storage;
 class ProductoController extends Controller
 {
 
-    public function index()
-    {
-        $productos = Producto::with('categoria')
-            ->orderBy('nombre')
-            ->paginate(10);
+   public function index(Request $request)
+{
+    $query = Producto::with('categoria');
 
-        return view('productos.index', compact('productos'));
+    // Buscar por código o nombre
+    if ($request->filled('buscar')) {
+        $buscar = $request->buscar;
+
+        $query->where(function ($q) use ($buscar) {
+            $q->where('codigo', 'like', "%{$buscar}%")
+              ->orWhere('nombre', 'like', "%{$buscar}%");
+        });
     }
+
+    // Filtrar por categoría
+    if ($request->filled('categoria')) {
+        $query->where('categoria_id', $request->categoria);
+    }
+
+    // Filtrar por estado
+    if ($request->estado !== null && $request->estado !== '') {
+        $query->where('estado', $request->estado);
+    }
+
+    $productos = $query
+        ->orderBy('nombre')
+        ->paginate(10)
+        ->withQueryString();
+
+    $categorias = Categoria::where('estado', true)
+        ->orderBy('nombre')
+        ->get();
+
+    return view('productos.index', compact(
+        'productos',
+        'categorias'
+    ));
+}
 
 
 

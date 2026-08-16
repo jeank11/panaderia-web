@@ -4,26 +4,64 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Cliente;
+use App\Models\Venta;
 
 class ClienteController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-   public function index()
+public function index(Request $request)
 {
-    $clientes = \App\Models\Cliente::withSum([
-        'ventas as deuda_actual' => function($query){
-
-            $query->where('estado_pago','!=','pagada');
-
+    $query = Cliente::withSum([
+        'ventas as deuda_actual' => function ($query) {
+            $query->where('estado_pago', '!=', 'pagada');
         }
-    ], 'saldo_pendiente')
-    ->orderBy('apellido')
-    ->paginate(10);
+    ], 'saldo_pendiente');
 
+    // Buscar
+    if ($request->filled('buscar')) {
 
-    return view('clientes.index', compact('clientes'));
+        $buscar = $request->buscar;
+
+        $query->where(function ($q) use ($buscar) {
+
+            $q->where('nombre', 'like', "%{$buscar}%")
+              ->orWhere('apellido', 'like', "%{$buscar}%")
+              ->orWhere('documento', 'like', "%{$buscar}%")
+              ->orWhere('telefono', 'like', "%{$buscar}%")
+              ->orWhere('email', 'like', "%{$buscar}%");
+
+        });
+
+    }
+
+    // Estado
+    if ($request->estado !== null && $request->estado !== '') {
+
+        $query->where('estado', $request->estado);
+
+    }
+
+    // Permiso de fiado
+    if ($request->permite_fiado !== null && $request->permite_fiado !== '') {
+
+        $query->where(
+            'permite_fiado',
+            $request->permite_fiado
+        );
+
+    }
+
+    $clientes = $query
+        ->orderBy('apellido')
+        ->paginate(10)
+        ->withQueryString();
+
+    return view(
+        'clientes.index',
+        compact('clientes')
+    );
 }
 
     /**
@@ -134,5 +172,27 @@ public function cuenta(Cliente $cliente)
         'ventas',
         'pagos'
     ));
+}
+public function reciboPago(Cliente $cliente)
+{
+
+    $ids = session('ventas_canceladas',[]);
+
+
+    $ventas = Venta::with([
+        'detalles.producto'
+    ])
+    ->whereIn('id',$ids)
+    ->get();
+
+
+    return view(
+        'clientes.recibo_pago',
+        compact(
+            'cliente',
+            'ventas'
+        )
+    );
+
 }
 }

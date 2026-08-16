@@ -193,14 +193,20 @@ public function pagoGlobal(Cliente $cliente)
 
 
 
-    return redirect()
+    session()->put(
+    'ventas_canceladas',
+    $ventas->pluck('id')->toArray()
+);
 
-        ->route('clientes.cuenta',$cliente)
 
-        ->with(
-            'success',
-            'Cuenta corriente cancelada correctamente.'
-        );
+return redirect()
+
+    ->route('clientes.recibo_pago',$cliente)
+
+    ->with(
+        'success',
+        'Cuenta corriente cancelada correctamente.'
+    );
 
 }
 

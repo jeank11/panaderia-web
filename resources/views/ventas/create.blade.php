@@ -19,10 +19,12 @@
                 <label class="form-label"><strong>Fecha</strong></label>
 
                 <input
-                    type="date"
-                    class="form-control"
-                    value="{{ date('Y-m-d') }}"
-                    readonly>
+    type="datetime-local"
+    id="fecha"
+    name="fecha"
+    class="form-control"
+    value="{{ now()->format('Y-m-d\TH:i') }}"
+    required>
 
             </div>
 
@@ -426,15 +428,17 @@ document.getElementById('guardarVenta')
 
         body: JSON.stringify({
 
-            cliente_id: cliente,
+    cliente_id: cliente,
 
-            productos: productosVenta,
+    fecha: document.getElementById('fecha').value,
 
-            total: total,
+    productos: productosVenta,
 
-            tipo_pago: tipoPago
+    total: total,
 
-        })
+    tipo_pago: tipoPago
+
+})
 
     })
     .then(async response => {
