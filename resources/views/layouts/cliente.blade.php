@@ -58,12 +58,12 @@
 
     <div class="container">
 
-        <a class="navbar-brand"
-           href="{{ route('clientes.perfil') }}">
+  <a class="navbar-brand"
+   href="{{ route('clientes.productos') }}">
 
-            🥖 PanaEcheveste
+    🥖 PanaEcheveste
 
-        </a>
+</a>
 
         <button class="navbar-toggler bg-light"
                 data-bs-toggle="collapse"

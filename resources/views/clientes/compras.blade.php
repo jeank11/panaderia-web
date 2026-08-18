@@ -2,180 +2,411 @@
 
 @section('contenido')
 
+<div class="container-fluid px-0">
 
-<h2 class="mb-4">
+    {{-- ENCABEZADO --}}
 
-    📜 Mis Compras
+    <div class="mb-4">
 
-</h2>
+        <h2 class="fw-bold mb-1">
 
+            📜 Mis Compras
 
+        </h2>
 
-@if($cliente->ventas->count())
+        <p class="text-muted mb-0">
 
+            Aquí puedes consultar el historial de tus compras.
 
-@foreach($cliente->ventas as $venta)
-
-
-
-<div class="card shadow mb-4">
-
-
-    <div class="card-header bg-success text-white">
-
-
-        <h5 class="mb-0">
-
-            Compra #{{ $venta->id }}
-
-        </h5>
-
+        </p>
 
     </div>
 
 
+    @if($cliente->ventas->count())
 
 
-    <div class="card-body">
+        {{-- COMPRAS --}}
+
+        @foreach($cliente->ventas as $venta)
+
+            <div class="card shadow-sm border-0 compra-card mb-4">
+
+                {{-- CABECERA --}}
+
+                <div class="card-header compra-header">
+
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+
+                        <div>
+
+                            <h5 class="mb-1 fw-bold">
+
+                                🧾 Compra #{{ $venta->id }}
+
+                            </h5>
+
+                            <small>
+
+                                📅
+
+                                {{ \Carbon\Carbon::parse($venta->fecha)->format('d/m/Y H:i') }}
+
+                            </small>
+
+                        </div>
 
 
-        <p>
+                        <div>
 
-            <strong>
-                Fecha:
-            </strong>
+                            @if($venta->pedido)
 
-            {{ \Carbon\Carbon::parse($venta->fecha)->format('d/m/Y H:i') }}
+                                <span class="badge bg-light text-dark">
 
-        </p>
+                                    📦 {{ $venta->pedido->codigo }}
 
+                                </span>
 
+                            @endif
 
-        @if($venta->pedido)
+                        </div>
 
+                    </div>
 
-        <p>
-
-            <strong>
-                Pedido:
-            </strong>
-
-            {{ $venta->pedido->codigo }}
-
-        </p>
+                </div>
 
 
-        @endif
+                {{-- CUERPO --}}
+
+                <div class="card-body">
 
 
+                    {{-- PRODUCTOS --}}
+
+                    <h5 class="fw-bold mb-3">
+
+                        🛍️ Productos
+
+                    </h5>
 
 
-        <hr>
+                    <div class="productos-compra">
 
 
+                        @foreach($venta->detalles as $detalle)
+
+                            <div class="producto-compra">
+
+                                <div>
+
+                                    <strong>
+
+                                        {{ $detalle->producto->nombre }}
+
+                                    </strong>
+
+                                    <div class="text-muted small">
+
+                                        Cantidad: {{ $detalle->cantidad }}
+
+                                    </div>
+
+                                </div>
 
 
-        <h5>
+                                <strong class="text-success">
 
-            Productos
+                                    ${{ number_format($detalle->subtotal,2) }}
 
-        </h5>
+                                </strong>
 
+                            </div>
 
-
-        <ul class="list-group mb-3">
-
-
-
-        @foreach($venta->detalles as $detalle)
+                        @endforeach
 
 
-
-            <li class="list-group-item d-flex justify-content-between">
-
-
-                <span>
+                    </div>
 
 
-                    {{ $detalle->producto->nombre }}
-
-                    x{{ $detalle->cantidad }}
+                    <hr>
 
 
-                </span>
+                    {{-- INFORMACIÓN DE PAGO --}}
+
+                    <div class="row g-3 mb-3">
 
 
+                        <div class="col-md-4">
 
-                <strong>
+                            <div class="info-compra">
 
+                                <small class="text-muted d-block">
 
-                    ${{ number_format($detalle->subtotal,2) }}
+                                    Tipo de pago
 
-
-                </strong>
-
-
-
-            </li>
+                                </small>
 
 
+                                @if($venta->tipo_pago == 'fiado')
+
+                                    <strong class="text-warning">
+
+                                        📒 Fiado
+
+                                    </strong>
+
+                                @else
+
+                                    <strong class="text-success">
+
+                                        💵 Contado
+
+                                    </strong>
+
+                                @endif
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <div class="info-compra">
+
+                                <small class="text-muted d-block">
+
+                                    Estado del pago
+
+                                </small>
+
+
+                                @if($venta->estado_pago == 'pagada')
+
+                                    <strong class="text-success">
+
+                                        ✅ Pagada
+
+                                    </strong>
+
+                                @elseif($venta->estado_pago == 'parcial')
+
+                                    <strong class="text-warning">
+
+                                        🟡 Pago parcial
+
+                                    </strong>
+
+                                @else
+
+                                    <strong class="text-danger">
+
+                                        🔴 Pendiente
+
+                                    </strong>
+
+                                @endif
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <div class="info-compra">
+
+                                <small class="text-muted d-block">
+
+                                    Total
+
+                                </small>
+
+
+                                <strong class="total-compra">
+
+                                    ${{ number_format($venta->total,2) }}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                    {{-- BOTÓN DETALLE --}}
+
+                    <div class="d-grid d-md-flex justify-content-md-end">
+
+                        <a
+                            href="{{ route('clientes.detalle.compra',$venta) }}"
+                            class="btn btn-outline-primary">
+
+                            👁️ Ver detalle de compra
+
+                        </a>
+
+                    </div>
+
+
+                </div>
+
+            </div>
 
         @endforeach
 
 
-
-        </ul>
-
+    @else
 
 
+        {{-- SIN COMPRAS --}}
 
-        <div class="text-end">
+        <div class="card shadow-sm border-0 text-center">
 
+            <div class="card-body py-5">
 
-            <h4>
+                <div class="compras-vacio">
 
+                    📜
 
-                Total:
-
-                <span class="text-success">
-
-                    ${{ number_format($venta->total,2) }}
-
-                </span>
+                </div>
 
 
-            </h4>
+                <h3 class="mt-3">
 
+                    Todavía no tienes compras
+
+                </h3>
+
+
+                <p class="text-muted">
+
+                    Cuando realices una compra, aparecerá aquí tu historial.
+
+                </p>
+
+
+                <a
+                    href="{{ route('clientes.productos') }}"
+                    class="btn btn-success btn-lg mt-2">
+
+                    🛍️ Comenzar a comprar
+
+                </a>
+
+            </div>
 
         </div>
 
-
-
-    </div>
-
+    @endif
 
 </div>
 
 
+<style>
 
-@endforeach
+    .compra-card{
 
+        border-radius:16px;
 
+        overflow:hidden;
 
-@else
-
-
-
-<div class="alert alert-info text-center">
-
-    Todavía no tienes compras realizadas.
-
-</div>
+    }
 
 
+    .compra-header{
 
-@endif
+        background:#198754;
+
+        color:white;
+
+        padding:18px 20px;
+
+    }
 
 
+    .productos-compra{
+
+        border:1px solid #e5e5e5;
+
+        border-radius:12px;
+
+        overflow:hidden;
+
+    }
+
+
+    .producto-compra{
+
+        display:flex;
+
+        justify-content:space-between;
+
+        align-items:center;
+
+        padding:14px 16px;
+
+        border-bottom:1px solid #eeeeee;
+
+    }
+
+
+    .producto-compra:last-child{
+
+        border-bottom:none;
+
+    }
+
+
+    .info-compra{
+
+        background:#f8f9fa;
+
+        border-radius:10px;
+
+        padding:14px;
+
+        height:100%;
+
+    }
+
+
+    .total-compra{
+
+        font-size:22px;
+
+        color:#198754;
+
+    }
+
+
+    .compras-vacio{
+
+        font-size:80px;
+
+    }
+
+
+    @media(max-width:576px){
+
+        .producto-compra{
+
+            padding:12px;
+
+        }
+
+
+        .compra-header{
+
+            padding:15px;
+
+        }
+
+    }
+
+</style>
 
 @endsection

@@ -26,6 +26,8 @@ class Pedido extends Model
 
         'total',
 
+        'tipo_pago',
+
         'estado'
 
     ];
@@ -39,8 +41,9 @@ class Pedido extends Model
     {
         return $this->hasMany(DetallePedido::class);
     }
+
     public function venta()
-{
-    return $this->hasOne(Venta::class);
-}
+    {
+        return $this->hasOne(Venta::class);
+    }
 }

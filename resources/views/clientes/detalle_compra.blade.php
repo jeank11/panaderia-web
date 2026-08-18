@@ -2,158 +2,339 @@
 
 @section('contenido')
 
-<div class="row justify-content-center">
+<div class="container-fluid px-0">
 
-    <div class="col-md-8">
+    {{-- ENCABEZADO --}}
 
-        <div class="card shadow">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
 
-            <div class="card-header bg-primary text-white">
+        <div>
 
-                <h3 class="mb-0">
-                    🧾 Detalle de Compra #{{ $venta->id }}
-                </h3>
+            <h2 class="fw-bold mb-1">
 
-            </div>
+                🧾 Detalle de Compra
 
+            </h2>
 
-            <div class="card-body">
+            <p class="text-muted mb-0">
 
+                Información completa de tu compra.
 
-                <p>
-                    <strong>Fecha:</strong>
+            </p>
 
-                    {{ \Carbon\Carbon::parse($venta->fecha)->format('d/m/Y') }}
-
-                </p>
+        </div>
 
 
-                <p>
+        <a
+            href="{{ route('clientes.productos') }}"
+            class="btn btn-success">
 
-                    <strong>Estado:</strong>
+            🛍️ Seguir comprando
+
+        </a>
+
+    </div>
+
+
+
+    {{-- ENCABEZADO DE LA COMPRA --}}
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+
+                <div class="col-md-6 mb-3 mb-md-0">
+
+                    <small class="text-muted d-block">
+
+                        Número de compra
+
+                    </small>
+
+                    <h3 class="fw-bold mb-0">
+
+                        🧾 #{{ $venta->id }}
+
+                    </h3>
+
+                </div>
+
+
+                <div class="col-md-6 text-md-end">
+
+                    <small class="text-muted d-block">
+
+                        Estado
+
+                    </small>
+
 
                     @if($venta->estado)
 
-                        <span class="badge bg-success">
-                            Activa
+                        <span class="badge bg-success fs-6 px-3 py-2">
+
+                            ✅ Compra activa
+
                         </span>
 
                     @else
 
-                        <span class="badge bg-danger">
-                            Anulada
+                        <span class="badge bg-danger fs-6 px-3 py-2">
+
+                            ❌ Compra anulada
+
                         </span>
 
                     @endif
 
-                </p>
+                </div>
 
 
-                <hr>
+            </div>
+
+        </div>
+
+    </div>
 
 
-                <h5>
-                    Productos comprados
-                </h5>
+
+    {{-- INFORMACIÓN --}}
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white border-0 pt-4 px-4">
+
+            <h5 class="fw-bold mb-0">
+
+                📋 Información de la compra
+
+            </h5>
+
+        </div>
 
 
-                <table class="table table-bordered">
+        <div class="card-body px-4">
+
+            <div class="row g-3">
 
 
-                    <thead class="table-dark">
+                <div class="col-md-4">
 
-                        <tr>
+                    <div class="info-box">
 
-                            <th>
-                                Producto
-                            </th>
+                        <small class="text-muted d-block">
 
-                            <th>
-                                Cantidad
-                            </th>
+                            Fecha
 
-                            <th>
-                                Precio
-                            </th>
+                        </small>
 
-                            <th>
-                                Subtotal
-                            </th>
+                        <strong>
 
-                        </tr>
+                            📅
 
-                    </thead>
+                            {{ \Carbon\Carbon::parse($venta->fecha)->format('d/m/Y H:i') }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
 
 
-                    <tbody>
+
+                <div class="col-md-4">
+
+                    <div class="info-box">
+
+                        <small class="text-muted d-block">
+
+                            Forma de pago
+
+                        </small>
 
 
-                    @foreach($venta->detalles as $detalle)
+                        @if($venta->tipo_pago == 'fiado')
+
+                            <strong class="text-warning">
+
+                                📒 Fiado
+
+                            </strong>
+
+                        @else
+
+                            <strong class="text-success">
+
+                                💵 Contado
+
+                            </strong>
+
+                        @endif
+
+                    </div>
+
+                </div>
 
 
-                        <tr>
 
-                            <td>
-                                {{ $detalle->producto->nombre }}
-                            </td>
+                <div class="col-md-4">
 
+                    <div class="info-box">
 
-                            <td>
-                                {{ $detalle->cantidad }}
-                            </td>
+                        <small class="text-muted d-block">
 
+                            Estado del pago
 
-                            <td>
-
-                                ${{ number_format($detalle->precio,2) }}
-
-                            </td>
+                        </small>
 
 
-                            <td>
+                        @if($venta->estado_pago == 'pagada')
 
-                                ${{ number_format($detalle->subtotal,2) }}
+                            <span class="badge bg-success">
 
-                            </td>
+                                ✅ Pagada
 
+                            </span>
 
-                        </tr>
+                        @elseif($venta->estado_pago == 'parcial')
 
+                            <span class="badge bg-warning text-dark">
 
-                    @endforeach
+                                🟡 Pago parcial
 
+                            </span>
 
-                    </tbody>
+                        @else
 
+                            <span class="badge bg-danger">
 
-                </table>
+                                🔴 Pendiente
 
+                            </span>
 
-                <hr>
+                        @endif
 
+                    </div>
 
-                <h4 class="text-end">
-
-                    Total:
-
-                    ${{ number_format($venta->total,2) }}
-
-                </h4>
+                </div>
 
 
             </div>
 
 
-            <div class="card-footer text-end">
+            {{-- PEDIDO RELACIONADO --}}
+
+            @if($venta->pedido)
+
+                <div class="info-box mt-3">
+
+                    <small class="text-muted d-block">
+
+                        Pedido relacionado
+
+                    </small>
+
+                    <strong>
+
+                        📦 {{ $venta->pedido->codigo }}
+
+                    </strong>
+
+                </div>
+
+            @endif
+
+        </div>
+
+    </div>
 
 
-                <a href="{{ route('clientes.compras') }}"
-                   class="btn btn-secondary">
 
-                    ← Volver
+    {{-- PRODUCTOS --}}
 
-                </a>
+    <div class="card shadow-sm border-0 mb-4">
 
+        <div class="card-header bg-white border-0 pt-4 px-4">
+
+            <h5 class="fw-bold mb-0">
+
+                🛒 Productos comprados
+
+            </h5>
+
+        </div>
+
+
+        <div class="card-body px-4">
+
+
+            @forelse($venta->detalles as $detalle)
+
+
+                <div class="producto-compra">
+
+                    <div>
+
+                        <h6 class="fw-bold mb-1">
+
+                            {{ $detalle->producto->nombre ?? 'Producto eliminado' }}
+
+                        </h6>
+
+                        <small class="text-muted">
+
+                            {{ $detalle->cantidad }}
+
+                            ×
+
+                            ${{ number_format($detalle->precio,2) }}
+
+                        </small>
+
+                    </div>
+
+
+                    <strong class="text-success">
+
+                        ${{ number_format($detalle->subtotal,2) }}
+
+                    </strong>
+
+                </div>
+
+
+            @empty
+
+                <div class="alert alert-info mb-0 text-center">
+
+                    No hay productos registrados en esta compra.
+
+                </div>
+
+            @endforelse
+
+
+            <hr>
+
+
+            {{-- TOTAL --}}
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <span class="fs-5 fw-bold">
+
+                    Total
+
+                </span>
+
+                <strong class="total-compra">
+
+                    ${{ number_format($venta->total,2) }}
+
+                </strong>
 
             </div>
 
@@ -162,7 +343,183 @@
 
     </div>
 
+
+
+    {{-- INFORMACIÓN DE DEUDA --}}
+
+    @if($venta->tipo_pago == 'fiado' && $venta->saldo_pendiente > 0)
+
+        <div class="card border-warning shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <div class="row align-items-center">
+
+
+                    <div class="col-md-8">
+
+                        <h5 class="fw-bold text-warning">
+
+                            📒 Compra fiada
+
+                        </h5>
+
+                        <p class="mb-0 text-muted">
+
+                            Esta compra tiene un saldo pendiente.
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+
+                        <small class="text-muted d-block">
+
+                            Saldo pendiente
+
+                        </small>
+
+                        <strong class="saldo-pendiente">
+
+                            ${{ number_format($venta->saldo_pendiente,2) }}
+
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    @elseif($venta->tipo_pago == 'fiado')
+
+        <div class="alert alert-success shadow-sm">
+
+            <strong>
+
+                ✅ Compra fiada totalmente pagada.
+
+            </strong>
+
+        </div>
+
+    @endif
+
+
+
+    {{-- BOTONES --}}
+
+    <div class="d-flex flex-column flex-md-row gap-2 mb-4">
+
+        <a
+            href="{{ route('clientes.compras') }}"
+            class="btn btn-outline-secondary">
+
+            ← Volver a mis compras
+
+        </a>
+
+
+        <a
+            href="{{ route('clientes.productos') }}"
+            class="btn btn-success">
+
+            🛍️ Hacer una nueva compra
+
+        </a>
+
+    </div>
+
 </div>
 
+
+
+<style>
+
+    .info-box{
+
+        background:#f8f9fa;
+
+        border-radius:12px;
+
+        padding:15px;
+
+        height:100%;
+
+    }
+
+
+    .producto-compra{
+
+        display:flex;
+
+        justify-content:space-between;
+
+        align-items:center;
+
+        gap:15px;
+
+        padding:16px 5px;
+
+        border-bottom:1px solid #eeeeee;
+
+    }
+
+
+    .producto-compra:last-child{
+
+        border-bottom:none;
+
+    }
+
+
+    .total-compra{
+
+        font-size:28px;
+
+        color:#198754;
+
+    }
+
+
+    .saldo-pendiente{
+
+        font-size:25px;
+
+        color:#dc3545;
+
+    }
+
+
+    @media(max-width:576px){
+
+        .producto-compra{
+
+            padding:14px 0;
+
+        }
+
+
+        .total-compra{
+
+            font-size:24px;
+
+        }
+
+
+        .saldo-pendiente{
+
+            font-size:22px;
+
+        }
+
+    }
+
+</style>
 
 @endsection

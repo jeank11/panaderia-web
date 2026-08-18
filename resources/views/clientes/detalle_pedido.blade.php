@@ -2,417 +2,575 @@
 
 @section('contenido')
 
-<div class="container">
+<div class="container-fluid px-0">
 
+    {{-- ENCABEZADO --}}
 
-    <h2 class="mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
 
-        📦 Detalle del Pedido
+        <div>
 
-    </h2>
+            <h2 class="fw-bold mb-1">
 
+                📦 Detalle del Pedido
 
+            </h2>
 
+            <p class="text-muted mb-0">
 
-    <div class="card shadow mb-4">
+                Información completa de tu pedido.
 
-
-        <div class="card-header bg-primary text-white">
-
-
-            <h5 class="mb-0">
-
-                Pedido {{ $pedido->codigo }}
-
-            </h5>
-
+            </p>
 
         </div>
 
 
+        <a
+            href="{{ route('clientes.productos') }}"
+            class="btn btn-success">
+
+            🛍️ Seguir comprando
+
+        </a>
+
+    </div>
 
 
-        <div class="card-body">
+    {{-- ESTADO DEL PEDIDO --}}
+
+    <div class="card shadow-sm border-0 estado-card mb-4">
+
+        <div class="card-body text-center py-4">
+
+            <small class="text-muted d-block mb-2">
+
+                Pedido
+
+            </small>
 
 
-            <div class="row">
+            <h3 class="fw-bold mb-3">
 
+                📦 {{ $pedido->codigo }}
+
+            </h3>
+
+
+            @switch($pedido->estado)
+
+                @case('Pendiente')
+
+                    <span class="estado-grande pendiente">
+
+                        🟡 Pendiente
+
+                    </span>
+
+                    <p class="text-muted mt-3 mb-0">
+
+                        Tu pedido fue recibido y está esperando ser preparado.
+
+                    </p>
+
+                @break
+
+
+                @case('Preparando')
+
+                    <span class="estado-grande preparando">
+
+                        🔵 Preparando
+
+                    </span>
+
+                    <p class="text-muted mt-3 mb-0">
+
+                        Estamos preparando tu pedido.
+
+                    </p>
+
+                @break
+
+
+                @case('Listo')
+
+                    <span class="estado-grande listo">
+
+                        🟢 Listo para retirar
+
+                    </span>
+
+                    <p class="text-muted mt-3 mb-0">
+
+                        Tu pedido está listo.
+
+                    </p>
+
+                @break
+
+
+                @case('Entregado')
+
+                    <span class="estado-grande entregado">
+
+                        ✅ Entregado
+
+                    </span>
+
+                    <p class="text-muted mt-3 mb-0">
+
+                        Este pedido ya fue entregado.
+
+                    </p>
+
+                @break
+
+
+                @case('Cancelado')
+
+                    <span class="estado-grande cancelado">
+
+                        ❌ Cancelado
+
+                    </span>
+
+                    <p class="text-muted mt-3 mb-0">
+
+                        Este pedido fue cancelado.
+
+                    </p>
+
+                @break
+
+            @endswitch
+
+        </div>
+
+    </div>
+
+
+    {{-- INFORMACIÓN DEL PEDIDO --}}
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white border-0 pt-4 px-4">
+
+            <h5 class="fw-bold mb-0">
+
+                📋 Información del pedido
+
+            </h5>
+
+        </div>
+
+
+        <div class="card-body px-4">
+
+            <div class="row g-3">
 
 
                 <div class="col-md-6">
 
+                    <div class="info-box">
 
-                    <p>
+                        <small class="text-muted d-block">
 
-                        <strong>
-                            Fecha del pedido:
-                        </strong>
+                            Fecha del pedido
 
-                        {{ \Carbon\Carbon::parse($pedido->fecha_pedido)->format('d/m/Y H:i') }}
-
-                    </p>
-
-
-
-                    <p>
+                        </small>
 
                         <strong>
-                            Fecha de entrega:
+
+                            📅
+
+                            {{ \Carbon\Carbon::parse($pedido->fecha_pedido)->format('d/m/Y H:i') }}
+
                         </strong>
 
-                        {{ \Carbon\Carbon::parse($pedido->fecha_entrega)->format('d/m/Y') }}
-
-                    </p>
-
-
-
-                    <p>
-
-                        <strong>
-                            Hora:
-                        </strong>
-
-                        {{ $pedido->hora_entrega }}
-
-                    </p>
-
+                    </div>
 
                 </div>
-
-
 
 
                 <div class="col-md-6">
 
+                    <div class="info-box">
 
-                    <p>
+                        <small class="text-muted d-block">
 
-                        <strong>
-                            Tipo de entrega:
-                        </strong>
+                            Fecha de entrega
 
-                        {{ $pedido->tipo_entrega }}
-
-                    </p>
-
-
-
-                    <p>
+                        </small>
 
                         <strong>
-                            Dirección:
+
+                            📅
+
+                            {{ \Carbon\Carbon::parse($pedido->fecha_entrega)->format('d/m/Y') }}
+
                         </strong>
 
-                        {{ $pedido->direccion_entrega ?? 'Retiro en local' }}
-
-                    </p>
-
-
-
-
-                    <p>
-
-                        <strong>
-                            Estado:
-                        </strong>
-
-
-                        @switch($pedido->estado)
-
-
-                            @case('Pendiente')
-
-                                <span class="badge bg-warning text-dark">
-
-                                    🟡 Pendiente
-
-                                </span>
-
-                            @break
-
-
-
-                            @case('Preparando')
-
-                                <span class="badge bg-primary">
-
-                                    🔵 Preparando
-
-                                </span>
-
-                            @break
-
-
-
-                            @case('Listo')
-
-                                <span class="badge bg-success">
-
-                                    🟢 Listo para retirar
-
-                                </span>
-
-                            @break
-
-
-
-                            @case('Entregado')
-
-                                <span class="badge bg-success">
-
-                                    ✅ Entregado
-
-                                </span>
-
-                            @break
-
-
-
-                            @case('Cancelado')
-
-                                <span class="badge bg-danger">
-
-                                    ❌ Cancelado
-
-                                </span>
-
-                            @break
-
-
-
-                        @endswitch
-
-
-                    </p>
-
-
+                    </div>
 
                 </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="info-box">
+
+                        <small class="text-muted d-block">
+
+                            Hora de entrega
+
+                        </small>
+
+                        <strong>
+
+                            ⏰ {{ $pedido->hora_entrega }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="info-box">
+
+                        <small class="text-muted d-block">
+
+                            Tipo de entrega
+
+                        </small>
+
+                        <strong>
+
+                            🚚 {{ $pedido->tipo_entrega }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-12">
+
+                    <div class="info-box">
+
+                        <small class="text-muted d-block">
+
+                            Dirección
+
+                        </small>
+
+                        <strong>
+
+                            📍 {{ $pedido->direccion_entrega ?? 'Retiro en local' }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                @if($pedido->observaciones)
+
+                    <div class="col-12">
+
+                        <div class="info-box">
+
+                            <small class="text-muted d-block">
+
+                                Observaciones
+
+                            </small>
+
+                            <strong>
+
+                                📝 {{ $pedido->observaciones }}
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                @endif
 
 
             </div>
 
+        </div>
+
+    </div>
 
 
+    {{-- PRODUCTOS --}}
 
-            @if($pedido->observaciones)
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white border-0 pt-4 px-4">
+
+            <h5 class="fw-bold mb-0">
+
+                🛒 Productos del pedido
+
+            </h5>
+
+        </div>
+
+
+        <div class="card-body px-4">
+
+
+            @forelse($pedido->detalles as $detalle)
+
+
+                {{-- PRODUCTO --}}
+
+                <div class="producto-pedido">
+
+                    <div>
+
+                        <h6 class="fw-bold mb-1">
+
+                            {{ $detalle->producto->nombre ?? 'Producto eliminado' }}
+
+                        </h6>
+
+                        <small class="text-muted">
+
+                            {{ $detalle->cantidad }} ×
+
+                            ${{ number_format($detalle->precio,2) }}
+
+                        </small>
+
+                    </div>
+
+
+                    <strong class="text-success">
+
+                        ${{ number_format($detalle->subtotal,2) }}
+
+                    </strong>
+
+                </div>
+
+
+            @empty
+
+
+                <div class="alert alert-info text-center mb-0">
+
+                    No hay productos registrados.
+
+                </div>
+
+
+            @endforelse
 
 
             <hr>
 
 
-            <p>
+            {{-- TOTAL --}}
 
-                <strong>
-                    Observaciones:
+            <div class="d-flex justify-content-between align-items-center">
+
+                <span class="fs-5 fw-bold">
+
+                    Total del pedido
+
+                </span>
+
+
+                <strong class="total-pedido">
+
+                    ${{ number_format($pedido->total,2) }}
+
                 </strong>
-
-                {{ $pedido->observaciones }}
-
-            </p>
-
-
-            @endif
-
-
-
-        </div>
-
-
-    </div>
-
-
-
-
-
-    <div class="card shadow">
-
-
-        <div class="card-header">
-
-
-            <strong>
-
-                🛒 Productos del pedido
-
-            </strong>
-
-
-        </div>
-
-
-
-
-
-        <div class="card-body">
-
-
-
-            <table class="table table-bordered align-middle">
-
-
-                <thead class="table-light">
-
-
-                    <tr>
-
-                        <th>
-                            Producto
-                        </th>
-
-                        <th width="120">
-                            Cantidad
-                        </th>
-
-                        <th width="140">
-                            Precio
-                        </th>
-
-                        <th width="140">
-                            Subtotal
-                        </th>
-
-
-                    </tr>
-
-
-                </thead>
-
-
-
-
-                <tbody>
-
-
-
-                @forelse($pedido->detalles as $detalle)
-
-
-
-                <tr>
-
-
-                    <td>
-
-
-                        {{ $detalle->producto->nombre ?? 'Producto eliminado' }}
-
-
-                    </td>
-
-
-
-                    <td>
-
-
-                        {{ $detalle->cantidad }}
-
-
-                    </td>
-
-
-
-                    <td>
-
-
-                        ${{ number_format($detalle->precio,2) }}
-
-
-                    </td>
-
-
-
-                    <td>
-
-
-                        ${{ number_format($detalle->subtotal,2) }}
-
-
-                    </td>
-
-
-
-                </tr>
-
-
-
-                @empty
-
-
-
-                <tr>
-
-                    <td colspan="4" class="text-center">
-
-
-                        No hay productos registrados.
-
-
-                    </td>
-
-
-                </tr>
-
-
-
-                @endforelse
-
-
-
-                </tbody>
-
-
-            </table>
-
-
-
-
-            <div class="text-end">
-
-
-                <h4>
-
-
-                    Total:
-
-                    <span class="text-success">
-
-                        ${{ number_format($pedido->total,2) }}
-
-                    </span>
-
-
-                </h4>
-
 
             </div>
 
 
-
         </div>
 
-
     </div>
 
 
+    {{-- BOTONES --}}
+
+    <div class="d-flex flex-column flex-md-row gap-2 mb-4">
+
+        <a
+            href="{{ route('clientes.pedidos') }}"
+            class="btn btn-outline-secondary">
+
+            ← Volver a mis pedidos
+
+        </a>
 
 
+        <a
+            href="{{ route('clientes.productos') }}"
+            class="btn btn-success">
 
-    <div class="mt-4">
+            🛍️ Hacer otro pedido
 
-
-        <a href="{{ route('clientes.pedidos') }}"
-   class="btn btn-secondary">
-    ← Volver a mis pedidos
-</a>
-
-
+        </a>
 
     </div>
-
-
 
 </div>
 
+
+<style>
+
+    .estado-card{
+
+        border-radius:18px;
+
+        overflow:hidden;
+
+    }
+
+
+    .estado-grande{
+
+        display:inline-block;
+
+        padding:10px 20px;
+
+        border-radius:30px;
+
+        font-size:18px;
+
+        font-weight:bold;
+
+    }
+
+
+    .pendiente{
+
+        background:#fff3cd;
+
+        color:#664d03;
+
+    }
+
+
+    .preparando{
+
+        background:#cfe2ff;
+
+        color:#084298;
+
+    }
+
+
+    .listo{
+
+        background:#d1e7dd;
+
+        color:#0f5132;
+
+    }
+
+
+    .entregado{
+
+        background:#d1e7dd;
+
+        color:#0f5132;
+
+    }
+
+
+    .cancelado{
+
+        background:#f8d7da;
+
+        color:#842029;
+
+    }
+
+
+    .info-box{
+
+        background:#f8f9fa;
+
+        border-radius:12px;
+
+        padding:15px;
+
+        height:100%;
+
+    }
+
+
+    .producto-pedido{
+
+        display:flex;
+
+        justify-content:space-between;
+
+        align-items:center;
+
+        gap:15px;
+
+        padding:15px 5px;
+
+        border-bottom:1px solid #eeeeee;
+
+    }
+
+
+    .producto-pedido:last-of-type{
+
+        border-bottom:none;
+
+    }
+
+
+    .total-pedido{
+
+        font-size:28px;
+
+        color:#198754;
+
+    }
+
+
+    @media(max-width:576px){
+
+        .estado-grande{
+
+            font-size:16px;
+
+        }
+
+
+        .producto-pedido{
+
+            padding:14px 0;
+
+        }
+
+
+        .total-pedido{
+
+            font-size:24px;
+
+        }
+
+    }
+
+</style>
 
 @endsection

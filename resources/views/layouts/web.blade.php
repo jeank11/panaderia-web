@@ -13,12 +13,17 @@
 
     <title>@yield('titulo','PanaEcheveste')</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
+
+        html{
+            scroll-behavior:smooth;
+        }
 
         body{
             background:#FFF8F0;
@@ -46,14 +51,51 @@
 
         .hero{
             padding:100px 0;
-            background:linear-gradient(
-                rgba(0,0,0,.45),
-                rgba(0,0,0,.45)
-            ),
-            url('https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1600&q=80');
+
+            background:
+                linear-gradient(
+                    rgba(0,0,0,.45),
+                    rgba(0,0,0,.45)
+                ),
+                url('https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1600&q=80');
 
             background-size:cover;
             background-position:center;
+
+            color:white;
+        }
+
+        .seccion-nosotros{
+            background:#FFF8F0;
+        }
+
+        .seccion-contacto{
+            background:white;
+        }
+
+        .info-card{
+            border:none;
+            border-radius:15px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,.08);
+
+            height:100%;
+        }
+
+        .info-icon{
+            font-size:45px;
+            color:#8B4513;
+        }
+
+        .whatsapp-btn{
+            background:#25D366;
+            color:white;
+            border:none;
+        }
+
+        .whatsapp-btn:hover{
+            background:#1ebe5d;
             color:white;
         }
 
@@ -68,237 +110,264 @@
 
 </head>
 
+
 <body>
+
 
 <nav class="navbar navbar-expand-lg">
 
-<div class="container">
+    <div class="container">
 
-<a class="navbar-brand" href="/">
+        <a class="navbar-brand" href="/">
 
-🥖 PanaEcheveste
+            🥖 PanaEcheveste
 
-</a>
+        </a>
 
-<button
-class="navbar-toggler bg-light"
-data-bs-toggle="collapse"
-data-bs-target="#menu">
 
-<span class="navbar-toggler-icon"></span>
+        <button
+            class="navbar-toggler bg-light"
+            data-bs-toggle="collapse"
+            data-bs-target="#menu">
 
-</button>
+            <span class="navbar-toggler-icon"></span>
 
-<div
-class="collapse navbar-collapse"
-id="menu">
+        </button>
 
-<ul class="navbar-nav ms-auto">
 
-<li class="nav-item">
+        <div
+            class="collapse navbar-collapse"
+            id="menu">
 
-<a class="nav-link" href="/">
+            <ul class="navbar-nav ms-auto">
 
-Inicio
 
-</a>
+                <li class="nav-item">
 
-</li>
+                    <a class="nav-link" href="/">
 
-<li class="nav-item">
+                        Inicio
 
-<a class="nav-link" href="#productos">
+                    </a>
 
-Productos
+                </li>
 
-</a>
 
-</li>
+                <li class="nav-item">
 
-<li class="nav-item">
+                    <a class="nav-link" href="#productos">
 
-<a class="nav-link" href="#">
+                        Productos
 
-Nosotros
+                    </a>
 
-</a>
+                </li>
 
-</li>
 
-<li class="nav-item">
+                <li class="nav-item">
 
-<a class="nav-link" href="#">
+                    <a class="nav-link" href="#nosotros">
 
-Contacto
+                        Nosotros
 
-</a>
+                    </a>
 
-</li>
+                </li>
 
-<li class="nav-item">
 
-<a
-class="nav-link"
-href="{{ route('carrito.index') }}">
+                <li class="nav-item">
 
-🛒 Carrito
+                    <a class="nav-link" href="#contacto">
 
-<span class="badge bg-warning text-dark">
+                        Contacto
 
-{{ count(session('carrito', [])) }}
+                    </a>
 
-</span>
+                </li>
 
-</a>
 
-</li>
+                <li class="nav-item">
 
-@if(session()->has('cliente_id'))
+                    <a
+                        class="nav-link"
+                        href="{{ route('carrito.index') }}">
 
-<li class="nav-item dropdown">
+                        🛒 Carrito
 
-    <a
-        class="nav-link dropdown-toggle"
-        href="#"
-        role="button"
-        data-bs-toggle="dropdown"
-        aria-expanded="false">
+                        <span class="badge bg-warning text-dark">
 
-        👤 {{ $clientePortal->nombre }}
+                            {{ count(session('carrito', [])) }}
 
-    </a>
+                        </span>
 
-    <ul class="dropdown-menu dropdown-menu-end">
+                    </a>
 
-        <li>
+                </li>
 
-            <a
-                class="dropdown-item"
-                href="{{ route('clientes.perfil') }}">
 
-                👤 Mi Perfil
+                @if(session()->has('cliente_id'))
 
-            </a>
+                    <li class="nav-item dropdown">
 
-        </li>
+                        <a
+                            class="nav-link dropdown-toggle"
+                            href="#"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
 
-        <li>
+                            👤 {{ $clientePortal->nombre }}
 
-            <a
-                class="dropdown-item"
-                href="{{ route('clientes.compras') }}">
+                        </a>
 
-                📦 Mis Pedidos
 
-            </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
 
-        </li>
+                            <li>
 
-        <li>
+                                <a
+                                    class="dropdown-item"
+                                    href="{{ route('clientes.perfil') }}">
 
-            <a
-                class="dropdown-item"
-                href="{{ route('carrito.index') }}">
+                                    👤 Mi Perfil
 
-                🛒 Mi Carrito
+                                </a>
 
-            </a>
+                            </li>
 
-        </li>
 
-        <li>
+                            <li>
 
-            <a
-                class="dropdown-item"
-                href="{{ route('clientes.password.form') }}">
+                                <a
+                                    class="dropdown-item"
+                                    href="{{ route('clientes.compras') }}">
 
-                🔑 Cambiar Contraseña
+                                    📦 Mis Pedidos
 
-            </a>
+                                </a>
 
-        </li>
+                            </li>
 
-        <li><hr class="dropdown-divider"></li>
 
-        <li>
+                            <li>
 
-            <form
-                action="{{ route('clientes.logout') }}"
-                method="POST">
+                                <a
+                                    class="dropdown-item"
+                                    href="{{ route('carrito.index') }}">
 
-                @csrf
+                                    🛒 Mi Carrito
 
-                <button
-                    type="submit"
-                    class="dropdown-item text-danger">
+                                </a>
 
-                    🚪 Cerrar sesión
+                            </li>
 
-                </button>
 
-            </form>
+                            <li>
 
-        </li>
+                                <a
+                                    class="dropdown-item"
+                                    href="{{ route('clientes.password.form') }}">
 
-    </ul>
+                                    🔑 Cambiar Contraseña
 
-</li>
+                                </a>
 
-@else
+                            </li>
 
-<li class="nav-item">
 
-    <a
-        class="btn btn-warning ms-3"
-        href="{{ route('clientes.login') }}">
+                            <li>
 
-        Ingresar
+                                <hr class="dropdown-divider">
 
-    </a>
+                            </li>
 
-</li>
 
-@endif
-</ul>
+                            <li>
 
-</div>
+                                <form
+                                    action="{{ route('clientes.logout') }}"
+                                    method="POST">
 
-</div>
+                                    @csrf
+
+                                    <button
+                                        type="submit"
+                                        class="dropdown-item text-danger">
+
+                                        🚪 Cerrar sesión
+
+                                    </button>
+
+                                </form>
+
+                            </li>
+
+                        </ul>
+
+                    </li>
+
+                @else
+
+                    <li class="nav-item">
+
+                        <a
+                            class="btn btn-warning ms-3"
+                            href="{{ route('clientes.login') }}">
+
+                            Ingresar
+
+                        </a>
+
+                    </li>
+
+                @endif
+
+
+            </ul>
+
+        </div>
+
+    </div>
 
 </nav>
 
+
 @yield('contenido')
+
 
 <footer>
 
-<div class="container text-center">
+    <div class="container text-center">
 
-<h5>
+        <h5>
 
-🥖 PanaEcheveste
+            🥖 PanaEcheveste
 
-</h5>
+        </h5>
 
-<p>
+        <p>
 
-Pan artesanal elaborado con pasión todos los días.
+            Panadería familiar de Piedras Coloradas,
+            con más de 30 años de trayectoria.
 
-</p>
+        </p>
 
-<p class="mb-0">
+        <p class="mb-0">
 
-© {{ date('Y') }}
+            © {{ date('Y') }}
 
-Todos los derechos reservados.
+            Todos los derechos reservados.
 
-</p>
+        </p>
 
-</div>
+    </div>
 
 </footer>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
 </html>
+
