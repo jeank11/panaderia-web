@@ -1,9 +1,42 @@
-
 @extends('layouts.cliente')
 
 @section('contenido')
 
 <div class="container py-4">
+    @if(session('success'))
+
+    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+
+        <div class="d-flex align-items-center">
+
+            <div class="fs-3 me-3">
+                ✅
+            </div>
+
+            <div>
+
+                <strong>
+                    Transferencia informada correctamente
+                </strong>
+
+                <div>
+                    {{ session('success') }}
+                </div>
+
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Cerrar">
+        </button>
+
+    </div>
+
+@endif
 
     {{-- Encabezado --}}
     <div class="text-center mb-4">
@@ -24,7 +57,36 @@
 
     </div>
 
+    {{-- Transferencia bancaria --}}
+    <div class="row justify-content-center mb-4">
 
+        <div class="col-lg-9">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-3 text-center">
+
+                    <a
+                        href="{{ route('clientes.transferencia.create') }}"
+                        class="btn btn-primary btn-lg w-100">
+
+                        🏦 Realizar transferencia bancaria
+
+                    </a>
+
+                    <small class="text-muted d-block mt-2">
+
+                        Consultá los datos bancarios para realizar tu pago.
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
     {{-- Información del cliente y deuda --}}
     <div class="row justify-content-center mb-4">
 
@@ -385,10 +447,15 @@
 
                                 <div class="text-muted small">
 
-                                    📅
-                                    {{ \Carbon\Carbon::parse($pago->fecha)->format('d/m/Y') }}
+    📅
+    {{ $pago->created_at->format('d/m/Y') }}
 
-                                </div>
+    &nbsp;
+
+    🕐
+    {{ $pago->created_at->format('H:i') }}
+
+</div>
 
 
                                 @if($pago->observacion)
@@ -411,6 +478,13 @@
                                     ${{ number_format($pago->monto, 2) }}
 
                                 </strong>
+                                <a
+    href="{{ route('clientes.detalle.pago', $pago) }}"
+    class="btn btn-sm btn-outline-primary mt-2">
+
+    👁️ Ver detalle
+
+</a>
 
                             </div>
 
@@ -440,7 +514,213 @@
                 </div>
 
             </div>
+            {{-- Transferencias realizadas --}}
+            <div class="card border-0 shadow-sm mb-4">
 
+                <div class="card-header bg-info text-white py-3">
+
+                    <div class="d-flex align-items-center">
+
+                        <div class="me-3 fs-3">
+                            🏦
+                        </div>
+
+                        <div>
+
+                            <h4 class="mb-0">
+                                Transferencias realizadas
+                            </h4>
+
+                            <small>
+                                Historial de transferencias informadas
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-body p-4">
+
+
+                    @forelse($transferencias as $transferencia)
+
+                        <div class="card border mb-3">
+
+                            <div class="card-body">
+
+                                <div class="row align-items-center">
+
+
+                                    {{-- Fecha --}}
+                                    <div class="col-md-3 mb-3 mb-md-0">
+
+                                        <small class="text-muted d-block">
+                                            📅 Fecha
+                                        </small>
+
+                                        <strong>
+
+                                            {{ \Carbon\Carbon::parse(
+                                                $transferencia->fecha_transferencia
+                                            )->format('d/m/Y') }}
+
+                                        </strong>
+
+                                    </div>
+
+
+                                    {{-- Monto --}}
+                                    <div class="col-md-3 mb-3 mb-md-0">
+
+                                        <small class="text-muted d-block">
+                                            💰 Monto
+                                        </small>
+
+                                        <strong class="fs-5">
+
+                                            ${{ number_format(
+                                                $transferencia->monto,
+                                                2
+                                            ) }}
+
+                                        </strong>
+
+                                    </div>
+
+
+                                    {{-- Referencia --}}
+                                    <div class="col-md-3 mb-3 mb-md-0">
+
+                                        <small class="text-muted d-block">
+                                            🔢 Referencia
+                                        </small>
+
+                                        <strong>
+
+                                            {{ $transferencia->referencia }}
+
+                                        </strong>
+
+                                    </div>
+
+
+                                    {{-- Estado --}}
+                                    <div class="col-md-3">
+
+                                        <small class="text-muted d-block">
+                                            📌 Estado
+                                        </small>
+
+
+                                        @if($transferencia->estado === 'pendiente')
+
+                                            <span class="badge bg-warning text-dark">
+
+                                                ⏳ Pendiente
+
+                                            </span>
+
+                                        @elseif($transferencia->estado === 'aprobado')
+
+                                            <span class="badge bg-success">
+
+                                                ✅ Aprobada
+
+                                            </span>
+
+                                        @elseif($transferencia->estado === 'rechazado')
+
+                                            <span class="badge bg-danger">
+
+                                                ❌ Rechazada
+
+                                            </span>
+
+                                        @else
+
+                                            <span class="badge bg-secondary">
+
+                                                {{ ucfirst($transferencia->estado) }}
+
+                                            </span>
+
+                                        @endif
+
+                                    </div>
+
+                                </div>
+
+
+                                {{-- Comprobante --}}
+                                @if($transferencia->comprobante)
+
+                                    <div class="border-top mt-3 pt-3">
+
+                                        <a
+                                            href="{{ asset(
+                                                'storage/' .
+                                                $transferencia->comprobante
+                                            ) }}"
+                                            target="_blank"
+                                            class="btn btn-sm btn-outline-primary">
+
+                                            📎 Ver comprobante
+
+                                        </a>
+
+                                    </div>
+
+                                @endif
+
+
+                                {{-- Observación --}}
+                                @if($transferencia->observacion)
+
+                                    <div class="border-top mt-3 pt-3">
+
+                                        <small class="text-muted d-block">
+                                            📝 Observación
+                                        </small>
+
+                                        <span>
+                                            {{ $transferencia->observacion }}
+                                        </span>
+
+                                    </div>
+
+                                @endif
+
+                            </div>
+
+                        </div>
+
+                    @empty
+
+                        <div class="text-center py-4">
+
+                            <div style="font-size: 50px;">
+                                🏦
+                            </div>
+
+                            <h5 class="mt-3">
+                                No hay transferencias registradas
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                Todavía no informaste ninguna transferencia.
+                            </p>
+
+                        </div>
+
+                    @endforelse
+
+
+                </div>
+
+            </div>
 
             {{-- Volver --}}
             <div class="text-center">

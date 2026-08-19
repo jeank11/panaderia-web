@@ -19,16 +19,152 @@
             Aquí puedes consultar el historial de tus compras.
 
         </p>
+        {{-- FILTROS --}}
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-body">
+
+        <form method="GET"
+              action="{{ route('clientes.compras') }}">
+
+            <div class="row g-3">
+
+                {{-- BUSCAR --}}
+
+                <div class="col-md-5">
+
+                    <label class="form-label fw-bold">
+
+                        🔎 Buscar
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="buscar"
+                        class="form-control"
+                        placeholder="Producto o número de compra"
+                        value="{{ request('buscar') }}">
+
+                </div>
+
+
+                {{-- TIPO DE PAGO --}}
+
+                <div class="col-md-3">
+
+                    <label class="form-label fw-bold">
+
+                        💳 Tipo de pago
+
+                    </label>
+
+                    <select
+                        name="tipo_pago"
+                        class="form-select">
+
+                        <option value="">
+                            Todos
+                        </option>
+
+                        <option
+                            value="contado"
+                            {{ request('tipo_pago') == 'contado' ? 'selected' : '' }}>
+
+                            💵 Contado
+
+                        </option>
+
+                        <option
+                            value="fiado"
+                            {{ request('tipo_pago') == 'fiado' ? 'selected' : '' }}>
+
+                            📒 Fiado
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                {{-- FECHA DESDE --}}
+
+                <div class="col-md-2">
+
+                    <label class="form-label fw-bold">
+
+                        📅 Desde
+
+                    </label>
+
+                    <input
+                        type="date"
+                        name="fecha_desde"
+                        class="form-control"
+                        value="{{ request('fecha_desde') }}">
+
+                </div>
+
+
+                {{-- FECHA HASTA --}}
+
+                <div class="col-md-2">
+
+                    <label class="form-label fw-bold">
+
+                        📅 Hasta
+
+                    </label>
+
+                    <input
+                        type="date"
+                        name="fecha_hasta"
+                        class="form-control"
+                        value="{{ request('fecha_hasta') }}">
+
+                </div>
+
+            </div>
+
+
+            <div class="d-flex gap-2 mt-3">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+
+                    🔎 Buscar
+
+                </button>
+
+
+                <a
+                    href="{{ route('clientes.compras') }}"
+                    class="btn btn-outline-secondary">
+
+                    🧹 Limpiar filtros
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
 
     </div>
 
 
-    @if($cliente->ventas->count())
+    @if($ventas->count())
 
 
         {{-- COMPRAS --}}
 
-        @foreach($cliente->ventas as $venta)
+       @foreach($ventas as $venta)
 
             <div class="card shadow-sm border-0 compra-card mb-4">
 
@@ -123,6 +259,7 @@
                             </div>
 
                         @endforeach
+
 
 
                     </div>
@@ -258,50 +395,57 @@
 
         @endforeach
 
+ {{-- PAGINACIÓN --}}
 
-    @else
+    <div class="mt-4">
 
+        <div class="d-flex justify-content-center">
 
-        {{-- SIN COMPRAS --}}
+    {{ $ventas->onEachSide(1)->links('pagination::bootstrap-5') }}
 
-        <div class="card shadow-sm border-0 text-center">
+</div>
 
-            <div class="card-body py-5">
+    </div>
+       @else
 
-                <div class="compras-vacio">
+    <div class="card shadow-sm border-0 text-center">
 
-                    📜
+        <div class="card-body py-5">
 
-                </div>
+            <div class="compras-vacio">
 
-
-                <h3 class="mt-3">
-
-                    Todavía no tienes compras
-
-                </h3>
-
-
-                <p class="text-muted">
-
-                    Cuando realices una compra, aparecerá aquí tu historial.
-
-                </p>
-
-
-                <a
-                    href="{{ route('clientes.productos') }}"
-                    class="btn btn-success btn-lg mt-2">
-
-                    🛍️ Comenzar a comprar
-
-                </a>
+                🔎
 
             </div>
 
+
+            <h3 class="mt-3">
+
+                No encontramos compras
+
+            </h3>
+
+
+            <p class="text-muted">
+
+                No hay compras que coincidan con los filtros seleccionados.
+
+            </p>
+
+
+            <a
+                href="{{ route('clientes.compras') }}"
+                class="btn btn-outline-primary mt-2">
+
+                🧹 Limpiar filtros
+
+            </a>
+
         </div>
 
-    @endif
+    </div>
+
+@endif
 
 </div>
 

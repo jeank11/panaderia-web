@@ -761,78 +761,184 @@
                                 </td>
 
 
-                                {{-- ESTADO --}}
+                               {{-- ESTADO --}}
 
-                                <td class="align-middle">
+<td class="align-middle">
 
-                                    <form
-                                        action="{{ route(
-                                            'pedidos.estado',
-                                            $pedido
-                                        ) }}"
-                                        method="POST">
+    <form
+        action="{{ route('pedidos.estado', $pedido) }}"
+        method="POST"
+        class="form-estado-pedido">
 
-                                        @csrf
+        @csrf
 
-                                        @method('PATCH')
+        @method('PATCH')
 
 
-                                        <select
-                                            name="estado"
-                                            class="form-select form-select-sm"
-                                            onchange="this.form.submit()">
+        <select
+            name="estado"
+            class="form-select form-select-sm select-estado"
+            data-pedido="{{ $pedido->id }}"
+        >
+
+            <option
+                value="Pendiente"
+                {{ $pedido->estado == 'Pendiente' ? 'selected' : '' }}>
+
+                🟡 Pendiente
+
+            </option>
 
 
-                                            <option
-                                                value="Pendiente"
-                                                {{ $pedido->estado == 'Pendiente' ? 'selected' : '' }}>
+            <option
+                value="Preparando"
+                {{ $pedido->estado == 'Preparando' ? 'selected' : '' }}>
 
-                                                🟡 Pendiente
+                🔵 Preparando
 
-                                            </option>
-
-
-                                            <option
-                                                value="Preparando"
-                                                {{ $pedido->estado == 'Preparando' ? 'selected' : '' }}>
-
-                                                🔵 Preparando
-
-                                            </option>
+            </option>
 
 
-                                            <option
-                                                value="Listo"
-                                                {{ $pedido->estado == 'Listo' ? 'selected' : '' }}>
+            <option
+                value="Listo"
+                {{ $pedido->estado == 'Listo' ? 'selected' : '' }}>
 
-                                                🟢 Listo
+                🟢 Listo
 
-                                            </option>
-
-
-                                            <option
-                                                value="Entregado"
-                                                {{ $pedido->estado == 'Entregado' ? 'selected' : '' }}>
-
-                                                ✅ Entregado
-
-                                            </option>
+            </option>
 
 
-                                            <option
-                                                value="Cancelado"
-                                                {{ $pedido->estado == 'Cancelado' ? 'selected' : '' }}>
+            <option
+                value="Entregado"
+                {{ $pedido->estado == 'Entregado' ? 'selected' : '' }}>
 
-                                                ❌ Cancelado
+                ✅ Entregado
 
-                                            </option>
+            </option>
 
-                                        </select>
 
-                                    </form>
+            <option
+                value="Cancelado"
+                {{ $pedido->estado == 'Cancelado' ? 'selected' : '' }}>
 
-                                </td>
+                ❌ Cancelado
 
+            </option>
+
+        </select>
+
+
+        {{-- Tipo de pago --}}
+
+        <div
+            class="modal fade"
+            id="modalPago{{ $pedido->id }}"
+            tabindex="-1"
+            aria-hidden="true">
+
+            <div class="modal-dialog modal-dialog-centered">
+
+                <div class="modal-content">
+
+
+                    <div class="modal-header">
+
+                        <h5 class="modal-title">
+
+                            💰 Forma de pago
+
+                        </h5>
+
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                        </button>
+
+                    </div>
+
+
+                    <div class="modal-body">
+
+                        <div class="text-center mb-3">
+
+                            <h5>
+
+                                Pedido #{{ $pedido->id }}
+
+                            </h5>
+
+                            <p class="text-muted mb-0">
+
+                                ¿Cómo pagará el cliente?
+
+                            </p>
+
+                        </div>
+
+
+                        <div class="d-grid gap-3">
+
+
+                            <button
+                                type="button"
+                                class="btn btn-success btn-lg btn-pago"
+                                data-tipo="contado"
+                                data-pedido="{{ $pedido->id }}">
+
+                                💵 Contado
+
+                                <small class="d-block">
+
+                                    El cliente paga ahora
+
+                                </small>
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="btn btn-warning btn-lg btn-pago"
+                                data-tipo="fiado"
+                                data-pedido="{{ $pedido->id }}">
+
+                                📒 Fiado
+
+                                <small class="d-block">
+
+                                    Se agrega a su cuenta corriente
+
+                                </small>
+
+                            </button>
+
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {{-- Campo oculto para enviar el tipo de pago --}}
+
+        <input
+            type="hidden"
+            name="tipo_pago"
+            class="tipo-pago"
+            id="tipoPago{{ $pedido->id }}"
+            value="">
+
+    </form>
+
+</td>
 
                                 {{-- VENTA --}}
 
@@ -900,9 +1006,9 @@
 
             {{-- PAGINACIÓN --}}
 
-            <div class="card-footer">
+           <div class="d-flex justify-content-center mt-4">
 
-                {{ $pedidos->links() }}
+                {{ $pedidos->onEachSide(1)->links('pagination::bootstrap-5') }}
 
             </div>
 
@@ -928,5 +1034,166 @@
     @endif
 
 </div>
+<script>
 
+document.addEventListener('DOMContentLoaded', function () {
+
+
+    document
+        .querySelectorAll('.select-estado')
+        .forEach(function (select) {
+
+
+            select.addEventListener('change', function () {
+
+
+                const formulario =
+                    this.closest('.form-estado-pedido');
+
+
+                const estadoAnterior =
+                    this.dataset.estadoAnterior || 'Pendiente';
+
+
+                const estado =
+                    this.value;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Si selecciona Entregado
+                |--------------------------------------------------------------------------
+                */
+
+                if (estado === 'Entregado') {
+
+
+                    const pedidoId =
+                        this.dataset.pedido;
+
+
+                    const modalElemento =
+                        document.getElementById(
+                            'modalPago' + pedidoId
+                        );
+
+
+                    const modal =
+                        new bootstrap.Modal(
+                            modalElemento
+                        );
+
+
+                    modal.show();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Evitar enviar automáticamente
+                    |--------------------------------------------------------------------------
+                    */
+
+                    return;
+
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Otros estados
+                |--------------------------------------------------------------------------
+                */
+
+                formulario.submit();
+
+            });
+
+
+        });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Seleccionar forma de pago
+    |--------------------------------------------------------------------------
+    */
+
+    document
+        .querySelectorAll('.btn-pago')
+        .forEach(function (boton) {
+
+
+            boton.addEventListener('click', function () {
+
+
+                const tipoPago =
+                    this.dataset.tipo;
+
+
+                const pedidoId =
+                    this.dataset.pedido;
+
+
+                const formulario =
+                    document.querySelector(
+                        '#modalPago' +
+                        pedidoId
+                    ).closest(
+                        '.form-estado-pedido'
+                    );
+
+
+                const campoPago =
+                    document.getElementById(
+                        'tipoPago' + pedidoId
+                    );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Guardar tipo de pago
+                |--------------------------------------------------------------------------
+                */
+
+                campoPago.value =
+                    tipoPago;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Cerrar modal
+                |--------------------------------------------------------------------------
+                */
+
+                const modalElemento =
+                    document.getElementById(
+                        'modalPago' + pedidoId
+                    );
+
+
+                const modal =
+                    bootstrap.Modal.getInstance(
+                        modalElemento
+                    );
+
+
+                modal.hide();
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Enviar formulario
+                |--------------------------------------------------------------------------
+                */
+
+                formulario.submit();
+
+            });
+
+
+        });
+
+});
+
+</script>
 @endsection

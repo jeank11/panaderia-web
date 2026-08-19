@@ -41,6 +41,10 @@
         🛒 Ventas
     </a>
 
+    <a href="{{ route('transferencias.index') }}">
+    🏦 Transferencias
+    </a>
+
 
     {{-- MENÚ ADMINISTRADOR --}}
 

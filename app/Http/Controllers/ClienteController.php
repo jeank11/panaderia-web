@@ -155,44 +155,132 @@ public function index(Request $request)
             ->route('clientes.index')
             ->with('success', 'Estado del cliente actualizado correctamente.');
 }
-public function cuenta(Cliente $cliente)
+
+public function cuenta(Request $request, Cliente $cliente)
 {
+    /*
+    |--------------------------------------------------------------------------
+    | Buscador
+    |--------------------------------------------------------------------------
+    */
+
+    $buscar = $request->buscar;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ventas pendientes
+    |--------------------------------------------------------------------------
+    */
+
     $ventas = $cliente->ventas()
-        ->where('estado_pago','pendiente')
+        ->whereIn('estado_pago', [
+            'pendiente',
+            'parcial'
+        ])
+        ->where('saldo_pendiente', '>', 0)
+        ->when($buscar, function ($query) use ($buscar) {
+
+            $query->where(function ($q) use ($buscar) {
+
+                $q->where('id', 'LIKE', '%' . $buscar . '%')
+                  ->orWhere('fecha', 'LIKE', '%' . $buscar . '%');
+
+            });
+
+        })
+        ->with([
+            'detalles.producto'
+        ])
+        ->orderBy('fecha', 'desc')
         ->get();
 
 
-    $pagos = $cliente->pagos()
-        ->orderBy('fecha','desc')
-        ->get();
+    /*
+    |--------------------------------------------------------------------------
+    | Historial de pagos
+    |--------------------------------------------------------------------------
+    */
+
+   $pagos = $cliente->pagos()
+    ->with([
+        'venta.detalles.producto',
+        'ventas.detalles.producto'
+
+    ])
+    ->orderBy('fecha', 'desc')
+    ->orderBy('created_at', 'desc')
+    ->get();
 
 
-    return view('clientes.cuenta', compact(
-        'cliente',
-        'ventas',
-        'pagos'
-    ));
+    return view(
+        'clientes.cuenta',
+        compact(
+            'cliente',
+            'ventas',
+            'pagos',
+            'buscar'
+        )
+    );
 }
+
+
 public function reciboPago(Cliente $cliente)
 {
+    $ids = session('ventas_canceladas', []);
 
-    $ids = session('ventas_canceladas',[]);
-
+    /*
+    |--------------------------------------------------------------------------
+    | Buscar las ventas que fueron canceladas
+    |--------------------------------------------------------------------------
+    */
 
     $ventas = Venta::with([
         'detalles.producto'
     ])
-    ->whereIn('id',$ids)
+    ->whereIn('id', $ids)
     ->get();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Buscar el pago realizado para estas ventas
+    |--------------------------------------------------------------------------
+    */
+
+    $pago = \App\Models\PagoCliente::where(
+        'cliente_id',
+        $cliente->id
+    )
+    ->where(function ($query) use ($ids) {
+
+        $query->whereIn('venta_id', $ids)
+              ->orWhereNull('venta_id');
+
+    })
+    ->latest()
+    ->first();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Monto realmente pagado
+    |--------------------------------------------------------------------------
+    */
+
+    $totalPagado = $pago
+        ? $pago->monto
+        : 0;
 
 
     return view(
         'clientes.recibo_pago',
         compact(
             'cliente',
-            'ventas'
+            'ventas',
+            'pago',
+            'totalPagado'
         )
     );
-
 }
 }

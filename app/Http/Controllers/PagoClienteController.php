@@ -130,20 +130,54 @@ if ($request->monto > $venta->saldo_pendiente) {
         ->with('success','Deuda cancelada correctamente.');
 
 }
-public function pagoGlobal(Cliente $cliente)
+public function pagoGlobal(Request $request, Cliente $cliente)
 {
+    /*
+    |--------------------------------------------------------------------------
+    | Validar pago
+    |--------------------------------------------------------------------------
+    */
+
+    $request->validate([
+
+        'monto' =>
+            'required|numeric|min:0.01',
+
+        'fecha' =>
+            'required|date',
+
+        'observacion' =>
+            'nullable|string|max:255',
+
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Buscar ventas pendientes
+    |--------------------------------------------------------------------------
+    */
 
     $ventas = $cliente->ventas()
-        ->where('tipo_pago','fiado')
-        ->where('estado',true)
-        ->whereIn('estado_pago',[
+        ->where('tipo_pago', 'fiado')
+        ->where('estado', true)
+        ->whereIn('estado_pago', [
             'pendiente',
             'parcial'
         ])
+        ->where('saldo_pendiente', '>', 0)
+        ->orderBy('fecha', 'asc')
+        ->orderBy('id', 'asc')
         ->get();
 
 
-    if($ventas->count() == 0){
+    /*
+    |--------------------------------------------------------------------------
+    | Verificar que existan deudas
+    |--------------------------------------------------------------------------
+    */
+
+    if ($ventas->count() == 0) {
 
         return redirect()
             ->back()
@@ -155,59 +189,386 @@ public function pagoGlobal(Cliente $cliente)
     }
 
 
-    $totalPagado = $ventas->sum('saldo_pendiente');
+    /*
+    |--------------------------------------------------------------------------
+    | Calcular deuda total
+    |--------------------------------------------------------------------------
+    */
+
+    $deudaTotal = $ventas->sum(
+        'saldo_pendiente'
+    );
 
 
-    \DB::transaction(function() use(
+    /*
+    |--------------------------------------------------------------------------
+    | Verificar que el pago no supere la deuda
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->monto > $deudaTotal) {
+
+        return redirect()
+            ->back()
+            ->with(
+                'error',
+                'El pago no puede superar la deuda actual de $'
+                . number_format($deudaTotal, 2)
+            );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Monto restante
+    |--------------------------------------------------------------------------
+    */
+
+    $montoRestante =
+        (float) $request->monto;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ventas afectadas
+    |--------------------------------------------------------------------------
+    */
+
+    $ventasAfectadas = [];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Registrar pago y distribuirlo
+    |--------------------------------------------------------------------------
+    */
+
+    $pago = DB::transaction(function () use (
         $cliente,
         $ventas,
-        $totalPagado
-    ){
+        $request,
+        &$montoRestante,
+        &$ventasAfectadas
+    ) {
 
-        \App\Models\PagoCliente::create([
+        /*
+        |--------------------------------------------------------------------------
+        | Determinar observación
+        |--------------------------------------------------------------------------
+        */
 
-            'cliente_id'=>$cliente->id,
-
-            'monto'=>$totalPagado,
-
-            'fecha'=>now(),
-
-            'observacion'=>'Pago total cuenta corriente'
-
-        ]);
-
+        $observacion =
+            $request->observacion;
 
 
-        foreach($ventas as $venta){
+        if (!$observacion) {
 
-            $venta->estado_pago='pagada';
-
-            $venta->saldo_pendiente=0;
-
-            $venta->save();
+            $observacion =
+                'Pago de cuenta corriente';
 
         }
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Crear el pago principal
+        |--------------------------------------------------------------------------
+        */
+
+        $pago = PagoCliente::create([
+
+            'cliente_id' =>
+                $cliente->id,
+
+            'monto' =>
+                $request->monto,
+
+            'fecha' =>
+                $request->fecha,
+
+            'observacion' =>
+                $observacion
+
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Distribuir el pago entre las ventas
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($ventas as $venta) {
+
+            if ($montoRestante <= 0) {
+
+                break;
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------
+            | Saldo actual de la venta
+            |--------------------------------------------------------------
+            */
+
+            $saldo =
+                (float) $venta->saldo_pendiente;
+
+
+            /*
+            |--------------------------------------------------------------
+            | Calcular cuánto se aplica
+            |--------------------------------------------------------------
+            */
+
+            $pagoAplicado =
+                min(
+                    $montoRestante,
+                    $saldo
+                );
+
+
+            /*
+            |--------------------------------------------------------------
+            | Calcular nuevo saldo
+            |--------------------------------------------------------------
+            */
+
+            $nuevoSaldo =
+                $saldo - $pagoAplicado;
+
+
+            /*
+            |--------------------------------------------------------------
+            | Actualizar estado de la venta
+            |--------------------------------------------------------------
+            */
+
+            if ($nuevoSaldo <= 0) {
+
+                $venta->saldo_pendiente = 0;
+
+                $venta->estado_pago =
+                    'pagada';
+
+            } else {
+
+                $venta->saldo_pendiente =
+                    $nuevoSaldo;
+
+                $venta->estado_pago =
+                    'parcial';
+
+            }
+
+
+            $venta->save();
+
+
+            /*
+            |--------------------------------------------------------------
+            | Relacionar el pago con la venta
+            |--------------------------------------------------------------
+            */
+
+            $pago->ventas()->attach(
+
+                $venta->id,
+
+                [
+                    'monto_aplicado' =>
+                        $pagoAplicado
+                ]
+
+            );
+
+
+            /*
+            |--------------------------------------------------------------
+            | Guardar venta afectada
+            |--------------------------------------------------------------
+            */
+
+            $ventasAfectadas[] =
+                $venta->id;
+
+
+            /*
+            |--------------------------------------------------------------
+            | Restar monto utilizado
+            |--------------------------------------------------------------
+            */
+
+            $montoRestante -=
+                $pagoAplicado;
+
+        }
+
+
+        return $pago;
+
     });
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Guardar ventas afectadas para el recibo
+    |--------------------------------------------------------------------------
+    */
 
     session()->put(
-    'ventas_canceladas',
-    $ventas->pluck('id')->toArray()
-);
-
-
-return redirect()
-
-    ->route('clientes.recibo_pago',$cliente)
-
-    ->with(
-        'success',
-        'Cuenta corriente cancelada correctamente.'
+        'ventas_canceladas',
+        $ventasAfectadas
     );
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Determinar mensaje
+    |--------------------------------------------------------------------------
+    */
+
+    if ($montoRestante <= 0) {
+
+        $mensaje =
+            'Pago registrado correctamente.';
+
+    } else {
+
+        $mensaje =
+            'Pago parcial registrado correctamente.';
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redireccionar al recibo
+    |--------------------------------------------------------------------------
+    */
+
+    return redirect()
+
+        ->route(
+            'clientes.recibo_pago',
+            $cliente
+        )
+
+        ->with(
+            'success',
+            $mensaje
+        );
+}
+public function detalle(PagoCliente $pago)
+{
+    $pago->load([
+        'cliente',
+        'ventas.detalles.producto'
+    ]);
+
+
+    $ventas = $pago->ventas->map(function ($venta) use ($pago) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Monto aplicado de este pago a esta venta
+        |--------------------------------------------------------------------------
+        */
+
+        $montoAplicado = $venta->pivot->monto_aplicado;
+
+
+        return [
+
+            'id' =>
+                $venta->id,
+
+            'fecha' =>
+                \Carbon\Carbon::parse(
+                    $venta->fecha
+                )->format('d/m/Y H:i'),
+
+            'total' =>
+                (float) $venta->total,
+
+            'saldo_pendiente' =>
+                (float) $venta->saldo_pendiente,
+
+            'estado_pago' =>
+                $venta->estado_pago,
+
+            'monto_aplicado' =>
+                (float) $montoAplicado,
+
+            'detalles' =>
+                $venta->detalles->map(function ($detalle) {
+
+                    return [
+
+                        'producto' => $detalle->producto
+                            ? [
+                                'id' =>
+                                    $detalle->producto->id,
+
+                                'nombre' =>
+                                    $detalle->producto->nombre
+                            ]
+                            : null,
+
+                        'cantidad' =>
+                            (float) $detalle->cantidad,
+
+                        'precio' =>
+                            (float) $detalle->precio,
+
+                        'subtotal' =>
+                            (float) $detalle->subtotal,
+
+                    ];
+
+                })->values()
+
+        ];
+
+    })->values();
+
+
+    return response()->json([
+
+        'id' =>
+            $pago->id,
+
+        'fecha' =>
+            $pago->created_at
+                ? $pago->created_at->format('d/m/Y H:i')
+                : $pago->fecha,
+
+        'monto' =>
+            (float) $pago->monto,
+
+        'observacion' =>
+            $pago->observacion,
+
+        'cliente' => $pago->cliente
+            ? [
+                'id' =>
+                    $pago->cliente->id,
+
+                'nombre' =>
+                    $pago->cliente->nombre,
+
+                'apellido' =>
+                    $pago->cliente->apellido,
+            ]
+            : null,
+
+        'ventas' =>
+            $ventas,
+
+    ]);
 }
 
 }

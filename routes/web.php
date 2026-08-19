@@ -15,6 +15,7 @@ use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\PagoClienteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdministradorController;
+use App\Http\Controllers\TransferenciaController;
 
 
 /*
@@ -88,6 +89,10 @@ Route::post(
 | Pedidos realizados desde el portal del cliente
 |--------------------------------------------------------------------------
 */
+Route::get(
+    '/portal/pago/{pago}',
+    [ClienteAuthController::class, 'detallePago']
+)->name('clientes.detalle.pago');
 
 Route::get(
     '/pedido/confirmar',
@@ -124,6 +129,19 @@ Route::post(
 | Portal del cliente
 |--------------------------------------------------------------------------
 */
+
+Route::get(
+    '/clientes/transferencia',
+    [ClienteAuthController::class, 'transferenciaCreate']
+)->name('clientes.transferencia.create');
+
+
+Route::post(
+    '/clientes/transferencia',
+    [ClienteAuthController::class, 'transferenciaStore']
+)->name('clientes.transferencia.store');
+
+
 
 Route::get(
     '/portal/login',
@@ -224,6 +242,11 @@ Route::post(
     [PagoClienteController::class, 'pagoGlobal']
 )->name('clientes.pago.global');
 
+Route::get(
+    '/pagos/{pago}/detalle',
+    [PagoClienteController::class, 'detalle']
+)->name('pagos.detalle');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -305,6 +328,8 @@ Route::middleware(['admin'])->group(function () {
         [VentaController::class, 'detalle']
     )->name('ventas.detalle');
 
+ 
+
 
     Route::get(
         'ventas/{venta}/ticket',
@@ -316,6 +341,21 @@ Route::middleware(['admin'])->group(function () {
         'ventas/{venta}/anular',
         [VentaController::class, 'anular']
     )->name('ventas.anular');
+
+    Route::get(
+    '/transferencias',
+    [TransferenciaController::class, 'index']
+    )->name('transferencias.index');
+
+    Route::post(
+    '/transferencias/{transferencia}/aprobar',
+    [TransferenciaController::class, 'aprobar']
+    )->name('transferencias.aprobar');
+
+    Route::post(
+    '/transferencias/{transferencia}/rechazar',
+    [TransferenciaController::class, 'rechazar']
+)->name('transferencias.rechazar');
 
 
     /*

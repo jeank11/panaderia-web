@@ -1104,20 +1104,67 @@ public function cambiarEstado(
     Pedido $pedido
 ) {
 
+    /*
+    |--------------------------------------------------------------------------
+    | Validar estado
+    |--------------------------------------------------------------------------
+    */
+
     $request->validate([
 
-        'estado' => 'required'
+        'estado' => 'required|string',
 
     ]);
 
 
     /*
     |--------------------------------------------------------------------------
-    | Actualizar estado del pedido
+    | Si el pedido pasa a Entregado
+    |--------------------------------------------------------------------------
+    | En este momento obligamos a elegir:
+    |
+    | contado
+    | fiado
+    |
+    */
+
+    if ($request->estado === 'Entregado') {
+
+        $request->validate([
+
+            'tipo_pago' => 'required|in:contado,fiado',
+
+        ]);
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Guardar tipo de pago en el pedido
     |--------------------------------------------------------------------------
     */
 
-    $pedido->estado = $request->estado;
+    if (
+        $request->estado === 'Entregado'
+        &&
+        $request->filled('tipo_pago')
+    ) {
+
+        $pedido->tipo_pago =
+            $request->tipo_pago;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actualizar estado
+    |--------------------------------------------------------------------------
+    */
+
+    $pedido->estado =
+        $request->estado;
 
     $pedido->save();
 
@@ -1129,7 +1176,7 @@ public function cambiarEstado(
     */
 
     if (
-        $request->estado == 'Entregado'
+        $request->estado === 'Entregado'
         &&
         !Venta::where(
             'pedido_id',
@@ -1140,28 +1187,26 @@ public function cambiarEstado(
 
         /*
         |--------------------------------------------------------------------------
-        | Determinar tipo de pago
+        | Tipo de pago elegido al entregar
         |--------------------------------------------------------------------------
-        |
-        | Si el pedido fue realizado como fiado,
-        | la venta también será fiada.
-        |
         */
 
-        $tipoPago = $pedido->tipo_pago ?? 'contado';
+        $tipoPago =
+            $request->tipo_pago;
 
 
         /*
         |--------------------------------------------------------------------------
-        | Estado del pago y saldo pendiente
+        | Determinar estado del pago
         |--------------------------------------------------------------------------
         */
 
-        if ($tipoPago == 'fiado') {
+        if ($tipoPago === 'fiado') {
 
             $estadoPago = 'pendiente';
 
-            $saldoPendiente = $pedido->total;
+            $saldoPendiente =
+                $pedido->total;
 
         } else {
 
@@ -1205,7 +1250,7 @@ public function cambiarEstado(
                 $estadoPago,
 
             'saldo_pendiente' =>
-                $saldoPendiente
+                $saldoPendiente,
 
         ]);
 
@@ -1236,7 +1281,7 @@ public function cambiarEstado(
                     $detalle->precio,
 
                 'subtotal' =>
-                    $detalle->subtotal
+                    $detalle->subtotal,
 
             ]);
 
@@ -1247,18 +1292,17 @@ public function cambiarEstado(
 
     /*
     |--------------------------------------------------------------------------
-    | Volver a pedidos
+    | Redireccionar
     |--------------------------------------------------------------------------
     */
 
     return redirect()
-        ->route(
-            'pedidos.index'
-        )
+        ->route('pedidos.index')
         ->with(
             'success',
-            'Estado actualizado correctamente.'
+            'Pedido actualizado y venta registrada correctamente.'
         );
+
 }
 
 
