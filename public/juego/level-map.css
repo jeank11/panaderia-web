@@ -1,0 +1,584 @@
+/* =========================================
+   MAPA DE NIVELES
+========================================= */
+
+.levelMap {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin: 28px 0 24px;
+    padding: 22px 10px;
+    position: relative;
+    max-height: 62vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.levelMap::before {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 50%;
+    height: 4px;
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(156, 104, 55, 0.28) 0 16px,
+        transparent 16px 30px
+    );
+    border-radius: 99px;
+    pointer-events: none;
+    opacity: 0.65;
+}
+
+.mapNode {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.mapNode:nth-child(4n + 1),
+.mapNode:nth-child(4n + 3) {
+    transform: translateY(-8px);
+}
+
+.mapNode:nth-child(4n + 2),
+.mapNode:nth-child(4n + 4) {
+    transform: translateY(8px);
+}
+
+.mapNode::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -13px;
+    width: 26px;
+    height: 4px;
+    border-radius: 99px;
+    background: rgba(156, 104, 55, 0.28);
+    z-index: -1;
+}
+
+.mapNode:nth-child(4n)::after,
+.mapNode:last-child::after {
+    display: none;
+}
+
+.levelMap .levelButton {
+    width: 100%;
+    min-height: 132px;
+    padding: 12px 8px 10px;
+    border-radius: 22px;
+    position: relative;
+    background: linear-gradient(145deg, #fffaf1, #f8dfb3);
+    border: 3px solid #d69a40;
+    box-shadow: 0 7px 0 #b27627, 0 10px 22px rgba(0,0,0,0.12);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+}
+
+.levelMap .levelButton:hover:not(:disabled) {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 10px 0 #b27627, 0 15px 28px rgba(0,0,0,0.16);
+}
+
+.levelMap .levelButton:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: 0 3px 0 #b27627, 0 8px 15px rgba(0,0,0,0.12);
+}
+
+.levelMap .mapCheckpoint {
+    display: block;
+    font-size: 32px;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.levelMap .levelNumber {
+    display: block;
+    font-size: 20px;
+}
+
+.levelMap .levelStars {
+    display: block;
+    margin-top: 5px;
+    font-size: 17px;
+    letter-spacing: 1px;
+}
+
+.levelMap .bestScore {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+}
+
+.levelMap .objectiveBadge {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 3px 7px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.72);
+    font-size: 11px;
+}
+
+.levelMap .mapNode.current .levelButton {
+    border-color: #ffb300;
+    box-shadow: 0 7px 0 #d98d00, 0 0 0 4px rgba(255, 179, 0, 0.18), 0 14px 28px rgba(255, 179, 0, 0.22);
+}
+
+.levelMap .mapNode.current .mapCheckpoint {
+    animation: mapCheckpointPulse 1.1s infinite ease-in-out;
+}
+
+.levelMap .mapNode.locked .levelButton {
+    background: linear-gradient(145deg, #eeeeee, #d6d6d6);
+    border-color: #b7b7b7;
+    box-shadow: 0 7px 0 #999, 0 9px 18px rgba(0,0,0,0.08);
+    filter: grayscale(0.85);
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+.levelMap .mapNode.locked .levelNumber {
+    color: #666;
+}
+
+@keyframes mapCheckpointPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12) rotate(-3deg); }
+}
+
+@media (max-width: 700px) {
+    .levelMap {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        padding-inline: 2px;
+    }
+
+    .levelMap::before {
+        display: none;
+    }
+
+    .mapNode::after {
+        display: none;
+    }
+
+    .levelMap .levelButton {
+        min-height: 126px;
+    }
+}
+
+@media (max-width: 420px) {
+    .levelMap .levelButton {
+        min-height: 116px;
+        border-radius: 18px;
+    }
+
+    .levelMap .mapCheckpoint {
+        font-size: 28px;
+    }
+
+    .levelMap .levelNumber {
+        font-size: 18px;
+    }
+}
+
+
+/* =========================================
+   ZONAS DEL MAPA
+========================================= */
+
+.levelMap {
+    align-items: center;
+}
+
+.mapZoneBanner {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin: 4px 0 -2px;
+    border-radius: 18px;
+    color: #5c3718;
+    box-shadow: 0 6px 16px rgba(0,0,0,.10);
+    border: 2px solid rgba(92,55,24,.15);
+}
+
+.mapZoneBanner .zoneIcon {
+    font-size: 34px;
+    line-height: 1;
+}
+
+.mapZoneBanner strong,
+.mapZoneBanner .zoneSubtitle {
+    display: block;
+}
+
+.mapZoneBanner strong {
+    font-size: 19px;
+}
+
+.mapZoneBanner .zoneSubtitle {
+    margin-top: 2px;
+    font-size: 12px;
+    opacity: .75;
+}
+
+.zone-bakery {
+    background: linear-gradient(135deg, #fff6e6, #f4d3a2);
+}
+
+.zone-oven {
+    background: linear-gradient(135deg, #fff0da, #f6b37a);
+}
+
+.zone-sweets {
+    background: linear-gradient(135deg, #fff0f0, #e8c5c5);
+}
+
+.zone-workshop {
+    background: linear-gradient(135deg, #f1ede7, #cfc1b2);
+}
+
+.zone-finale {
+    background: linear-gradient(135deg, #fff7cf, #f1d36d);
+}
+
+.zone-node-oven .levelButton {
+    border-color: #d97a3f;
+}
+
+.zone-node-sweets .levelButton {
+    border-color: #b97d86;
+}
+
+.zone-node-workshop .levelButton {
+    border-color: #8b6d55;
+}
+
+.zone-node-finale .levelButton {
+    border-color: #d6a31d;
+}
+
+.zone-node-finale.current .levelButton {
+    box-shadow: 0 7px 0 #b5800c, 0 0 0 4px rgba(255,193,7,.22), 0 14px 30px rgba(255,193,7,.24);
+}
+
+@media (max-width: 700px) {
+    .mapZoneBanner {
+        margin-top: 8px;
+    }
+}
+
+
+/* ===== Sistema de vidas ===== */
+.livesDisplay {
+    width: min(92%, 520px);
+    margin: 10px auto 18px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: rgba(255,255,255,.92);
+    border: 2px solid rgba(226, 166, 65, .55);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+    box-sizing: border-box;
+}
+.livesLabel {
+    font-weight: 800;
+    color: #8b4e23;
+}
+.livesHearts {
+    font-size: 22px;
+    letter-spacing: 2px;
+    white-space: nowrap;
+}
+.livesDisplay.noLives {
+    border-color: rgba(194, 75, 75, .6);
+}
+.livesWarning {
+    grid-column: 1 / -1;
+    margin: 0 auto 12px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: rgba(255, 237, 237, .95);
+    border: 2px solid rgba(194, 75, 75, .35);
+    color: #8f2f2f;
+    text-align: center;
+}
+.livesWarning span {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+}
+@media (max-width: 600px) {
+    .livesDisplay {
+        width: 94%;
+        padding: 9px 12px;
+    }
+    .livesHearts {
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+}
+
+
+/* ===== Recuperación de vidas ===== */
+.livesTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+}
+
+.livesRecovery {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    color: #7a4a2a;
+}
+
+.livesRecovery strong {
+    font-variant-numeric: tabular-nums;
+}
+
+.livesRecovery.livesFull {
+    color: #45824b;
+}
+
+.restoreLivesButton {
+    display: block;
+    margin: 0 auto 10px;
+    padding: 7px 12px;
+    border: 1px dashed #b98552;
+    border-radius: 10px;
+    background: #fff8ec;
+    color: #7a4a2a;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.restoreLivesButton:hover {
+    transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+    .livesTopRow {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+/* ==============================
+   MONEDAS
+============================== */
+.mapPlayerStats {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: none;
+    margin: 10px 0 8px;
+    align-items: stretch;
+}
+
+.mapPlayerStats > .livesDisplay,
+.mapPlayerStats > .coinsDisplay {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.coinsDisplay {
+    min-height: 74px;
+    padding: 10px 14px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 2px solid #f4c84a;
+    overflow: hidden;
+}
+
+.coinsIcon {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffe990 0 22%, #f6c33b 45%, #d89a18 100%);
+    border: 3px solid #b97a0c;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.45), 0 2px 5px rgba(0,0,0,.18);
+    color: #8d5a00;
+    font-size: 19px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.coinsLabel {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.coinsDisplay strong {
+    font-size: 20px;
+    white-space: nowrap;
+}
+
+.buyLifeButton {
+    display: block;
+    margin: 8px auto 12px;
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 14px;
+    background: #ffd95a;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,.15);
+}
+
+.buyLifeButton:disabled {
+    opacity: .7;
+    cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .mapPlayerStats {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ===== Ajuste final: paneles de vidas y monedas ===== */
+.mapPlayerStats {
+    position: relative;
+    z-index: 5;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    overflow: visible;
+}
+
+.mapPlayerStats > .livesDisplay,
+.mapPlayerStats > .coinsDisplay {
+    position: relative;
+    z-index: 2;
+}
+
+.mapPlayerStats > .buyLifeButton {
+    grid-column: 1 / -1;
+    width: min(100%, 360px);
+    justify-self: center;
+    position: relative;
+    z-index: 10;
+    margin: 0;
+    min-height: 42px;
+    white-space: nowrap;
+}
+
+.coinsDisplay {
+    position: relative;
+    z-index: 3;
+}
+
+.buyLifeButton .coinBadge {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: -6px;
+    margin-left: 3px;
+    margin-right: 2px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffe990 0 22%, #f6c33b 45%, #d89a18 100%);
+    border: 2px solid #b97a0c;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.5), 0 1px 3px rgba(0,0,0,.2);
+    color: #8d5a00;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+@media (max-width: 640px) {
+    .mapPlayerStats {
+        grid-template-columns: 1fr;
+    }
+    .mapPlayerStats > .buyLifeButton {
+        grid-column: auto;
+        width: min(100%, 340px);
+    }
+}
+
+/* ===== Corrección final: mensaje de vidas completas ===== */
+.mapPlayerStats {
+    isolation: isolate;
+}
+
+.mapPlayerStats > .livesDisplay {
+    z-index: 20;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.mapPlayerStats > .coinsDisplay {
+    z-index: 10;
+    position: relative;
+}
+
+.livesDisplay .livesTopRow {
+    width: 100%;
+    position: relative;
+    z-index: 2;
+}
+
+.livesDisplay .livesRecovery {
+    width: 100%;
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* Nuevas zonas para la campaña de 60 niveles */
+.zone-boxes {
+    background: linear-gradient(135deg, #fff1da, #f7d09a);
+}
+.zone-ice {
+    background: linear-gradient(135deg, #e8fbff, #bceaf7);
+}
+.zone-frozenWorkshop {
+    background: linear-gradient(135deg, #edf7ff, #cfe4f7);
+}
+.zone-challenge {
+    background: linear-gradient(135deg, #fff2d9, #ffd29e);
+}
+.zone-finale {
+    background: linear-gradient(135deg, #fff8d6, #f7df9a);
+}
+
+.levelMap {
+    max-height: 68vh;
+}
+
+@media (max-width: 700px) {
+    .levelMap {
+        max-height: 66vh;
+    }
+}

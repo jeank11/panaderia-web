@@ -1,0 +1,201 @@
+/* =========================================
+   ANIMACIONES DE PIEZAS
+========================================= */
+
+.cell.pieceChange {
+    animation: pieceDrop 0.28s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes pieceDrop {
+    0% {
+        transform: translateY(-18px) scale(0.86);
+        opacity: 0;
+    }
+    65% {
+        transform: translateY(4px) scale(1.03);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.cell.selected.pieceChange {
+    animation:
+        pieceDrop 0.28s cubic-bezier(.2,.8,.2,1),
+        selectedPiece 0.5s infinite alternate 0.28s;
+}
+
+/* Las piezas se acomodan con una pequeña suavidad
+   cuando cambian de posición. */
+.cell {
+    will-change: transform, opacity;
+}
+
+/* =========================================
+   PIEZAS ESPECIALES: PRODUCTO + ✨ JUNTOS
+========================================= */
+
+.cell {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.cell .pieceEmoji {
+    position: relative;
+    z-index: 2;
+    display: inline-block;
+    line-height: 1;
+}
+
+.cell.specialPiece {
+    overflow: hidden;
+}
+
+.cell.specialPiece::before {
+    content: "";
+    position: absolute;
+    inset: 7%;
+    border-radius: 50%;
+    z-index: 0;
+    background: radial-gradient(circle, rgba(255, 215, 70, 0.58), rgba(255, 193, 7, 0.2) 58%, transparent 76%);
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.8), inset 0 0 5px rgba(255,255,255,0.48);
+    animation: specialBubblePulse 1.15s ease-in-out infinite alternate;
+}
+
+.specialComboVisual {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.02em;
+    line-height: 1;
+    white-space: nowrap;
+    font-size: 1em;
+    transform: translateZ(0);
+}
+
+.cell.specialPiece .specialSpark {
+    position: relative;
+    display: inline-block;
+    font-size: 0.72em;
+    line-height: 1;
+    transform: translateY(-0.10em);
+    filter: drop-shadow(0 0 3px rgba(255, 215, 70, 0.95));
+    animation: specialSparkPulse 1s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+.cell.rainbowPiece::before {
+    content: "";
+    position: absolute;
+    inset: 8%;
+    border-radius: 50%;
+    z-index: 0;
+    background: conic-gradient(#ff4d6d, #ffb703, #8ac926, #00b4d8, #7b2cbf, #ff4d6d);
+    opacity: 0.48;
+    filter: blur(1px);
+    animation: rainbowPulse 1.25s linear infinite;
+}
+
+.cell.rainbowPiece .pieceEmoji {
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9));
+}
+
+@keyframes specialBubblePulse {
+    from {
+        transform: scale(0.92);
+        opacity: 0.65;
+    }
+    to {
+        transform: scale(1.04);
+        opacity: 1;
+    }
+}
+
+@keyframes specialSparkPulse {
+    from {
+        transform: translateY(-0.10em) scale(0.92) rotate(5deg);
+        opacity: 0.78;
+    }
+    to {
+        transform: translateY(-0.10em) scale(1.08) rotate(15deg);
+        opacity: 1;
+    }
+}
+
+@keyframes rainbowPulse {
+    from {
+        transform: scale(0.94) rotate(0deg);
+    }
+    to {
+        transform: scale(1.05) rotate(360deg);
+    }
+}
+
+/* =========================================
+   PARTÍCULAS SOBRE EL TABLERO
+========================================= */
+#board {
+    position: relative;
+}
+
+.particleLayer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 40;
+}
+
+.boardParticle {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    pointer-events: none;
+    user-select: none;
+    line-height: 1;
+    animation-name: particleBurst;
+    animation-timing-function: cubic-bezier(.15,.7,.2,1);
+    animation-fill-mode: forwards;
+    text-shadow: 0 1px 4px rgba(0,0,0,.25);
+}
+
+.sweetParticle { color: #fff7c2; }
+.boxParticle { color: #f5c37a; }
+.iceParticle { color: #d8f6ff; text-shadow: 0 0 5px rgba(120,220,255,.8); }
+.specialParticle { color: #fff2a8; text-shadow: 0 0 7px rgba(255,210,60,.95); }
+.rainbowParticle { color: #fff; text-shadow: 0 0 7px rgba(255,255,255,.95); }
+
+@keyframes particleBurst {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(.45) rotate(0deg);
+    }
+    16% {
+        opacity: 1;
+    }
+    72% {
+        opacity: .95;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.95) rotate(var(--rot));
+    }
+}
+
+/* Golpes de obstáculos */
+.boxCell.boxHitFlash,
+.iceCell.iceHitFlash {
+    animation: obstacleHit .24s ease-out;
+}
+
+@keyframes obstacleHit {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.10) rotate(-2deg); }
+    100% { transform: scale(1); }
+}

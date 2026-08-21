@@ -156,6 +156,11 @@ Route::post(
 
 
 Route::middleware(['cliente'])->group(function () {
+ 
+
+    Route::get('/portal/juego', function () {
+    return view('clientes.juego.index');
+    })->name('juego');
 
     Route::get(
         '/portal/perfil',

@@ -151,6 +151,17 @@
 
 </li>
 
+    <li>
+
+    <a  
+        class="dropdown-item"
+        href="{{ route('juego') }}">
+    🎮 Jugar
+
+    </a>
+
+</li>
+
 <li>
 
     <a
