@@ -142,6 +142,179 @@
 
         }
 
+        /* =========================================================
+   BOTÓN VOLVER A NIVELES
+   ========================================================= */
+
+.backToLevelsButton {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 9999;
+
+    padding: 10px 16px;
+
+    background: rgba(255, 255, 255, 0.95);
+    color: #6b3e26;
+
+    border: 2px solid #d49a5b;
+    border-radius: 12px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.backToLevelsButton:hover {
+    background: #fff;
+    transform: translateY(-2px);
+
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.backToLevelsButton:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+
+    .backToLevelsButton {
+        top: 10px;
+        left: 10px;
+
+        padding: 8px 12px;
+
+        font-size: 12px;
+    }
+
+}
+/* =========================================================
+   RANKING DESTACADO
+   ========================================================= */
+
+.rankingMainButton {
+    width: 100%;
+    max-width: 420px;
+
+    margin: 15px auto;
+
+    padding: 14px 20px;
+
+    border: none;
+    border-radius: 16px;
+
+    background: linear-gradient(
+        135deg,
+        #ffd54f,
+        #ff9800
+    );
+
+    color: #5d351c;
+
+    font-size: 18px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 12px rgba(0, 0, 0, 0.20);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.rankingMainButton:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+.rankingMainButton:active {
+    transform: translateY(0);
+}
+
+.rankingMainButton span {
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    opacity: 0.8;
+}
+
+@media (max-width: 600px) {
+
+    .rankingMainButton {
+        max-width: 100%;
+
+        padding: 12px 15px;
+
+        font-size: 16px;
+    }
+
+    .rankingMainButton span {
+        font-size: 11px;
+    }
+
+}
+/*
+|--------------------------------------------------------------------------
+| OPCIONES DEL NIVEL FALLIDO
+|--------------------------------------------------------------------------
+*/
+
+.failedActions {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    width: min(90%, 360px);
+
+    margin: 20px auto 0;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| BOTONES DEL NIVEL FALLIDO
+|--------------------------------------------------------------------------
+*/
+
+.failedActions button {
+
+    width: 100%;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| BOTÓN +5 MOVIMIENTOS
+|--------------------------------------------------------------------------
+*/
+
+#failedExtraMovesButton {
+
+    font-weight: 700;
+
+}
+
     </style>
 
 </head>
@@ -316,31 +489,56 @@
             </div>
 
 
+            <!-- =========================================================
+     BOTONES DE PRUEBA / DESARROLLO
+     
+     Estos botones se utilizan únicamente durante el desarrollo
+     del juego para realizar pruebas rápidas:
+
+     - Recargar vidas
+     - Agregar 500 monedas
+     - Desbloquear los 60 niveles
+
+     IMPORTANTE:
+     Estos botones no deberían estar visibles en la versión final
+     del juego para los jugadores.
+     ========================================================= -->
+
+<!--
+<button
+    id="restoreLivesButton"
+    class="restoreLivesButton"
+    type="button"
+>
+    🛠️ Recargar vidas (pruebas)
+</button>
+
+
+<button
+    id="devCoinsButton"
+    class="restoreLivesButton"
+    type="button"
+>
+    🛠️ +500 monedas (pruebas)
+</button>
+
+
+<button
+    id="devUnlockButton"
+    class="restoreLivesButton"
+    type="button"
+>
+    🛠️ Desbloquear 60 niveles (pruebas)
+</button>
+-->
+
             <button
-                id="restoreLivesButton"
-                class="restoreLivesButton"
+                 id="rankingButton"
+                class="rankingMainButton"
                 type="button"
-            >
-                🛠️ Recargar vidas (pruebas)
-            </button>
-
-
-            <button
-                id="devCoinsButton"
-                class="restoreLivesButton"
-                type="button"
-            >
-                🛠️ +500 monedas (pruebas)
-            </button>
-
-
-            <button
-                id="devUnlockButton"
-                class="restoreLivesButton"
-                type="button"
-            >
-                🛠️ Desbloquear 60 niveles (pruebas)
-            </button>
+    >
+                 🏆 VER RANKING
+           </button>
 
 
             <button
@@ -360,12 +558,7 @@
 
             <div class="levelMenuActions">
 
-                <button
-                    id="rankingButton"
-                    class="secondaryButton"
-                >
-                    🏆 Ranking
-                </button>
+            
 
 
                 <button
@@ -386,12 +579,18 @@
     <!-- PANTALLA DEL JUEGO                -->
     <!-- ================================= -->
 
-    <div
-        id="gameScreen"
-        class="screen hidden"
-    >
+    <div id="gameScreen" class="screen hidden">
 
-        <div class="game">
+    <!-- Volver al mapa de niveles -->
+    <button
+        id="backToLevelsButton"
+        class="backToLevelsButton"
+        type="button"
+    >
+        ← Volver a niveles
+    </button>
+
+    <div class="game">
 
             <div class="gameHeader">
 
@@ -643,28 +842,85 @@
             <!-- NIVEL FALLIDO                     -->
             <!-- ================================= -->
 
-            <div id="levelFailed">
+            <!-- ========================================================= -->
+<!-- NIVEL FALLIDO                                            -->
+<!-- ========================================================= -->
 
-                <div class="resultIcon">
-                    😔
-                </div>
+<div id="levelFailed">
+
+    <div class="resultIcon">
+        😔
+    </div>
+
+    <h2>
+        ¡Te quedaste sin movimientos!
+    </h2>
+
+    <p id="failedScore"></p>
+
+    <p id="failedTarget"></p>
 
 
-                <h2>
-                    Nivel fallido
-                </h2>
+    <!-- ===================================================== -->
+    <!-- OPCIONES AL QUEDARSE SIN MOVIMIENTOS                  -->
+    <!-- ===================================================== -->
+
+    <div class="failedActions">
+
+        <!-- ================================================= -->
+        <!-- COMPRAR POTENCIADORES                              -->
+        <!-- ================================================= -->
+
+        <button
+            id="failedShopButton"
+            class="mainButton"
+            type="button"
+        >
+            🛒 Comprar potenciadores
+        </button>
 
 
-                <p id="failedScore"></p>
+        <!-- ================================================= -->
+        <!-- COMPRAR +5 MOVIMIENTOS                             -->
+        <!-- ================================================= -->
 
-                <p id="failedTarget"></p>
+        <button
+            id="failedExtraMovesButton"
+            class="secondaryButton"
+            type="button"
+        >
+            👟 Comprar +5 movimientos
+        </button>
 
 
-                <button id="retryLevelButton">
-                    🔄 Reintentar nivel
-                </button>
+        <!-- ================================================= -->
+        <!-- REINTENTAR NIVEL                                   -->
+        <!-- ================================================= -->
 
-            </div>
+        <button
+            id="retryLevelButton"
+            class="secondaryButton"
+            type="button"
+        >
+            🔄 Reintentar nivel
+        </button>
+
+
+        <!-- ================================================= -->
+        <!-- VOLVER AL MAPA                                     -->
+        <!-- ================================================= -->
+
+        <button
+            id="failedBackToLevelsButton"
+            class="secondaryButton"
+            type="button"
+        >
+            🗺️ Volver a niveles
+        </button>
+
+    </div>
+
+</div>
 
         </div>
 

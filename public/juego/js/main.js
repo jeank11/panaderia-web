@@ -24,6 +24,7 @@ function openNicknameModal() {
 
 function closeNicknameModal() {
     if (!nicknameModal) return;
+
     nicknameModal.classList.add("hidden");
     nicknameModal.setAttribute("aria-hidden", "true");
 }
@@ -32,392 +33,1313 @@ function savePlayerNickname() {
     const nickname = sanitizeNickname(nicknameInput.value);
 
     if (nickname.length < 3 || nickname.length > 15) {
-        nicknameError.textContent = "El apodo debe tener entre 3 y 15 caracteres.";
+        nicknameError.textContent =
+            "El apodo debe tener entre 3 y 15 caracteres.";
+
         nicknameInput.focus();
+
         return false;
     }
 
     state.playerName = nickname;
+
     localStorage.setItem("candyPlayerName", nickname);
+
     closeNicknameModal();
+
     return true;
 }
 
 if (saveNicknameButton) {
+
     saveNicknameButton.addEventListener("click", () => {
+
         if (savePlayerNickname()) {
+
             initAudio();
             startMusic();
             playSelectSound();
+
             startScreen.classList.add("hidden");
+
             levelSelectScreen.classList.remove("hidden");
-            renderLevelButtons(levelNumber => loadLevel(levelNumber, handleClick));
+
+            renderLevelButtons(
+                levelNumber => loadLevel(levelNumber, handleClick)
+            );
         }
+
     });
 }
 
 if (nicknameInput) {
+
     nicknameInput.addEventListener("keydown", event => {
+
         if (event.key === "Enter") {
+
             event.preventDefault();
+
             saveNicknameButton.click();
         }
+
     });
 }
 
-const startScreen = document.getElementById("startScreen");
-const levelSelectScreen = document.getElementById("levelSelectScreen");
-const gameScreen = document.getElementById("gameScreen");
-const playButton = document.getElementById("playButton");
-const backToStartButton = document.getElementById("backToStartButton");
-const nextLevelButton = document.getElementById("nextLevelButton");
-const retryLevelButton = document.getElementById("retryLevelButton");
-const rankingButton = document.getElementById("rankingButton");
-const closeRankingButton = document.getElementById("closeRankingButton");
-const closeRankingButtonBottom = document.getElementById("closeRankingButtonBottom");
+
+/*
+|--------------------------------------------------------------------------
+| PANTALLAS
+|--------------------------------------------------------------------------
+*/
+
+const startScreen =
+    document.getElementById("startScreen");
+
+const levelSelectScreen =
+    document.getElementById("levelSelectScreen");
+
+const gameScreen =
+    document.getElementById("gameScreen");
+
+
+/*
+|--------------------------------------------------------------------------
+| BOTONES
+|--------------------------------------------------------------------------
+*/
+
+const playButton =
+    document.getElementById("playButton");
+
+const backToStartButton =
+    document.getElementById("backToStartButton");
+
+/*
+|--------------------------------------------------------------------------
+| NUEVO BOTÓN:
+| VOLVER AL MAPA DE NIVELES
+|--------------------------------------------------------------------------
+*/
+
+const backToLevelsButton =
+    document.getElementById("backToLevelsButton");
+
+
+const nextLevelButton =
+    document.getElementById("nextLevelButton");
+
+const retryLevelButton =
+    document.getElementById("retryLevelButton");
+
+
+/*
+|--------------------------------------------------------------------------
+| OPCIONES CUANDO EL NIVEL FALLA
+|--------------------------------------------------------------------------
+*/
+
+const failedShopButton =
+    document.getElementById(
+        "failedShopButton"
+    );
+
+const failedExtraMovesButton =
+    document.getElementById(
+        "failedExtraMovesButton"
+    );
+
+const failedBackToLevelsButton =
+    document.getElementById(
+        "failedBackToLevelsButton"
+    );
+
+const rankingButton =
+    document.getElementById("rankingButton");
+
+const closeRankingButton =
+    document.getElementById("closeRankingButton");
+
+const closeRankingButtonBottom =
+    document.getElementById("closeRankingButtonBottom");
+
+
+/*
+|--------------------------------------------------------------------------
+| CLICK EN UNA CASILLA
+|--------------------------------------------------------------------------
+*/
 
 function handleClick(row, col) {
+
     if (typeof activeBooster !== "undefined") {
-        if (activeBooster === "hammer") { useHammerOnCell(row, col); return; }
-        if (activeBooster === "bomb") { useBombAtCell(row, col); return; }
-        if (activeBooster === "rocket") { useRocketAtCell(row, col); return; }
+
+        if (activeBooster === "hammer") {
+
+            useHammerOnCell(row, col);
+
+            return;
+        }
+
+        if (activeBooster === "bomb") {
+
+            useBombAtCell(row, col);
+
+            return;
+        }
+
+        if (activeBooster === "rocket") {
+
+            useRocketAtCell(row, col);
+
+            return;
+        }
+
         if (activeBooster === "swap") {
+
             if (!canMoveCell(row, col)) return;
-            if (!state.selected) { state.selected = {row, col}; renderBoard(); return; }
+
+            if (!state.selected) {
+
+                state.selected = {
+                    row,
+                    col
+                };
+
+                renderBoard();
+
+                return;
+            }
+
             const first = state.selected;
-            if (first.row === row && first.col === col) { state.selected = null; renderBoard(); return; }
-            activateSwapBooster(first, {row, col});
+
+            if (
+                first.row === row &&
+                first.col === col
+            ) {
+
+                state.selected = null;
+
+                renderBoard();
+
+                return;
+            }
+
+            activateSwapBooster(
+                first,
+                {
+                    row,
+                    col
+                }
+            );
+
             return;
         }
     }
 
-    if (state.busy || state.levelComplete) return;
-
-    if (state.moves <= 0) {
-        document.getElementById("message").textContent = "😔 Se terminaron los movimientos.";
-        return;
-    }
-
-    if (!canMoveCell(row, col)) {
-        state.selected = null;
-        playInvalidMoveSound();
-        const message = state.boxes[row]?.[col] > 0
-            ? "📦 Esa casilla está bloqueada. Rompe la caja para liberar el producto."
-            : state.ice[row]?.[col] > 0
-                ? "🧊 Esa pieza está congelada. Rompe el hielo para liberarla."
-                : "🚫 Esa zona del tablero no tiene casilla.";
-        document.getElementById("message").textContent = message;
-        renderBoard();
-        renderObjectives();
-        return;
-    }
-
-    if (!state.selected) {
-        state.selected = { row, col };
-        playSelectSound();
-        renderBoard();
-        renderObjectives();
-        return;
-    }
-
-    if (state.selected.row === row && state.selected.col === col) {
-        state.selected = null;
-        playSelectSound();
-        renderBoard();
-        renderObjectives();
-        return;
-    }
-
-    const second = { row, col };
 
     if (
-        Math.abs(state.selected.row - second.row) +
-        Math.abs(state.selected.col - second.col) !== 1
+        state.busy ||
+        state.levelComplete
     ) {
-        state.selected = second;
-        playSelectSound();
-        renderBoard();
-        renderObjectives();
         return;
     }
+
+
+    if (state.moves <= 0) {
+
+        document.getElementById("message").textContent =
+            "😔 Se terminaron los movimientos.";
+
+        return;
+    }
+
+
+    if (!canMoveCell(row, col)) {
+
+        state.selected = null;
+
+        playInvalidMoveSound();
+
+        const message =
+            state.boxes[row]?.[col] > 0
+                ? "📦 Esa casilla está bloqueada. Rompe la caja para liberar el producto."
+                : state.ice[row]?.[col] > 0
+                    ? "🧊 Esa pieza está congelada. Rompe el hielo para liberarla."
+                    : "🚫 Esa zona del tablero no tiene casilla.";
+
+        document.getElementById("message").textContent =
+            message;
+
+        renderBoard();
+
+        renderObjectives();
+
+        return;
+    }
+
+
+    if (!state.selected) {
+
+        state.selected = {
+            row,
+            col
+        };
+
+        playSelectSound();
+
+        renderBoard();
+
+        renderObjectives();
+
+        return;
+    }
+
+
+    if (
+        state.selected.row === row &&
+        state.selected.col === col
+    ) {
+
+        state.selected = null;
+
+        playSelectSound();
+
+        renderBoard();
+
+        renderObjectives();
+
+        return;
+    }
+
+
+    const second = {
+        row,
+        col
+    };
+
+
+    if (
+        Math.abs(
+            state.selected.row - second.row
+        ) +
+        Math.abs(
+            state.selected.col - second.col
+        ) !== 1
+    ) {
+
+        state.selected = second;
+
+        playSelectSound();
+
+        renderBoard();
+
+        renderObjectives();
+
+        return;
+    }
+
 
     const first = {
         row: state.selected.row,
         col: state.selected.col
     };
 
+
     if (!canMoveCell(second.row, second.col)) {
-        state.selected = { row: second.row, col: second.col };
+
+        state.selected = {
+            row: second.row,
+            col: second.col
+        };
+
         playInvalidMoveSound();
-        const message = state.boxes[second.row]?.[second.col] > 0
-            ? "📦 Esa casilla está bloqueada. Rompe la caja para liberar el producto."
-            : state.ice[second.row]?.[second.col] > 0
-                ? "🧊 Esa pieza está congelada. Rompe el hielo para liberarla."
-                : "🚫 Esa zona del tablero no tiene casilla.";
-        document.getElementById("message").textContent = message;
+
+        const message =
+            state.boxes[second.row]?.[second.col] > 0
+                ? "📦 Esa casilla está bloqueada. Rompe la caja para liberar el producto."
+                : state.ice[second.row]?.[second.col] > 0
+                    ? "🧊 Esa pieza está congelada. Rompe el hielo para liberarla."
+                    : "🚫 Esa zona del tablero no tiene casilla.";
+
+        document.getElementById("message").textContent =
+            message;
+
         renderBoard();
+
         renderObjectives();
+
         return;
     }
 
-    const firstSpecial = state.specialType[first.row][first.col];
-    const secondSpecial = state.specialType[second.row][second.col];
+
+    const firstSpecial =
+        state.specialType[first.row][first.col];
+
+    const secondSpecial =
+        state.specialType[second.row][second.col];
+
 
     let rowSpecialPieceType = null;
 
+
     if (firstSpecial === 1) {
-        rowSpecialPieceType = state.board[first.row][first.col];
+
+        rowSpecialPieceType =
+            state.board[first.row][first.col];
+
     } else if (secondSpecial === 1) {
-        rowSpecialPieceType = state.board[second.row][second.col];
+
+        rowSpecialPieceType =
+            state.board[second.row][second.col];
     }
+
 
     let rainbowTargetType = null;
 
-    if (firstSpecial === 2 && secondSpecial === 0) {
-        rainbowTargetType = state.board[second.row][second.col];
-    } else if (secondSpecial === 2 && firstSpecial === 0) {
-        rainbowTargetType = state.board[first.row][first.col];
+
+    if (
+        firstSpecial === 2 &&
+        secondSpecial === 0
+    ) {
+
+        rainbowTargetType =
+            state.board[second.row][second.col];
+
+    } else if (
+        secondSpecial === 2 &&
+        firstSpecial === 0
+    ) {
+
+        rainbowTargetType =
+            state.board[first.row][first.col];
     }
+
 
     swapPieces(first, second);
 
-    // 🌈 + ✨
+
+    /*
+    |--------------------------------------------------------------------------
+    | 🌈 + ✨
+    |--------------------------------------------------------------------------
+    */
+
     if (
         (firstSpecial === 2 && secondSpecial === 1) ||
         (firstSpecial === 1 && secondSpecial === 2)
     ) {
+
         state.moves--;
+
         state.selected = null;
+
         state.busy = true;
+
         playValidMoveSound();
+
         playSuperRainbowSound();
-        document.getElementById("message").textContent = "🌈💥 ¡SUPER ARCOÍRIS!";
+
+        document.getElementById("message").textContent =
+            "🌈💥 ¡SUPER ARCOÍRIS!";
+
         renderBoard();
+
         renderObjectives();
-        awaitSpecial(resolveRainbowRowCombo(rowSpecialPieceType));
+
+        awaitSpecial(
+            resolveRainbowRowCombo(
+                rowSpecialPieceType
+            )
+        );
+
         return;
     }
 
-    // ✨ + ✨
-    if (firstSpecial === 1 && secondSpecial === 1) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | ✨ + ✨
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        firstSpecial === 1 &&
+        secondSpecial === 1
+    ) {
+
         state.moves--;
+
         state.selected = null;
+
         state.busy = true;
+
         playValidMoveSound();
+
         playSpecialComboSound();
-        document.getElementById("message").textContent = "💥 ¡SUPER COMBO!";
+
+        document.getElementById("message").textContent =
+            "💥 ¡SUPER COMBO!";
+
         renderBoard();
+
         renderObjectives();
-        awaitSpecial(resolveSpecialRowColumnCombo(second.row, second.col, first.row, first.col));
+
+        awaitSpecial(
+            resolveSpecialRowColumnCombo(
+                second.row,
+                second.col,
+                first.row,
+                first.col
+            )
+        );
+
         return;
     }
 
-    // 🌈 + 🌈
-    if (firstSpecial === 2 && secondSpecial === 2) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | 🌈 + 🌈
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        firstSpecial === 2 &&
+        secondSpecial === 2
+    ) {
+
         state.moves--;
+
         state.selected = null;
+
         state.busy = true;
+
         playValidMoveSound();
+
         playSuperRainbowSound();
-        document.getElementById("message").textContent = "🌈🌈 ¡MEGA COMBO!";
+
+        document.getElementById("message").textContent =
+            "🌈🌈 ¡MEGA COMBO!";
+
         renderBoard();
+
         renderObjectives();
-        awaitSpecial(resolveDoubleRainbow());
+
+        awaitSpecial(
+            resolveDoubleRainbow()
+        );
+
         return;
     }
 
-    // 🌈 + normal
-    if (firstSpecial === 2 || secondSpecial === 2) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | 🌈 + NORMAL
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        firstSpecial === 2 ||
+        secondSpecial === 2
+    ) {
+
         state.moves--;
+
         state.selected = null;
+
         state.busy = true;
+
         playValidMoveSound();
+
         playRainbowActivateSound();
-        document.getElementById("message").textContent = "🌈 ¡PIEZA ARCOÍRIS!";
+
+        document.getElementById("message").textContent =
+            "🌈 ¡PIEZA ARCOÍRIS!";
+
         renderBoard();
+
         renderObjectives();
 
-        const rainbowCell = firstSpecial === 2
-            ? { row: second.row, col: second.col }
-            : { row: first.row, col: first.col };
 
-        awaitSpecial(resolveRainbow(rainbowCell, rainbowTargetType));
+        const rainbowCell =
+            firstSpecial === 2
+                ? {
+                    row: second.row,
+                    col: second.col
+                }
+                : {
+                    row: first.row,
+                    col: first.col
+                };
+
+
+        awaitSpecial(
+            resolveRainbow(
+                rainbowCell,
+                rainbowTargetType
+            )
+        );
+
         return;
     }
 
-    // ✨ + normal
-    if (firstSpecial === 1 || secondSpecial === 1) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | ✨ + NORMAL
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        firstSpecial === 1 ||
+        secondSpecial === 1
+    ) {
+
         state.moves--;
+
         state.selected = null;
+
         state.busy = true;
+
         playValidMoveSound();
+
         playSpecialActivateSound();
-        document.getElementById("message").textContent = "💥 ¡PIEZA ESPECIAL!";
+
+        document.getElementById("message").textContent =
+            "💥 ¡PIEZA ESPECIAL!";
+
         renderBoard();
+
         renderObjectives();
 
-        const activatedCells = firstSpecial === 1
-            ? [{ row: second.row, col: second.col }]
-            : [{ row: first.row, col: first.col }];
 
-        awaitSpecial(resolveSpecials(activatedCells));
+        const activatedCells =
+            firstSpecial === 1
+                ? [
+                    {
+                        row: second.row,
+                        col: second.col
+                    }
+                ]
+                : [
+                    {
+                        row: first.row,
+                        col: first.col
+                    }
+                ];
+
+
+        awaitSpecial(
+            resolveSpecials(
+                activatedCells
+            )
+        );
+
         return;
     }
 
-    // Movimiento normal
-    const currentMatches = findMatches();
+
+    /*
+    |--------------------------------------------------------------------------
+    | MOVIMIENTO NORMAL
+    |--------------------------------------------------------------------------
+    */
+
+    const currentMatches =
+        findMatches();
+
 
     if (currentMatches.size === 0) {
+
         swapPieces(first, second);
+
         state.selected = null;
+
         playInvalidMoveSound();
-        document.getElementById("message").textContent = "Ese movimiento no forma una combinación.";
+
+        document.getElementById("message").textContent =
+            "Ese movimiento no forma una combinación.";
+
         renderBoard();
+
         renderObjectives();
+
         return;
     }
 
-    state.moves--;
-    state.selected = null;
-    state.busy = true;
-    playValidMoveSound();
-    document.getElementById("message").textContent = "¡Excelente!";
-    renderBoard();
-        renderObjectives();
 
-    awaitSpecial(resolveBoard({
-        preferredCells: [first, second],
-        showComboMessage
-    }));
+    state.moves--;
+
+    state.selected = null;
+
+    state.busy = true;
+
+    playValidMoveSound();
+
+    document.getElementById("message").textContent =
+        "¡Excelente!";
+
+    renderBoard();
+
+    renderObjectives();
+
+
+    awaitSpecial(
+        resolveBoard({
+            preferredCells: [
+                first,
+                second
+            ],
+            showComboMessage
+        })
+    );
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| ESPERAR ANIMACIONES / COMBOS
+|--------------------------------------------------------------------------
+*/
 
 function awaitSpecial(promise) {
+
     promise.then(() => {
+
         state.busy = false;
-        if (state.moves <= 0) checkLevelComplete();
+
+        if (state.moves <= 0) {
+            checkLevelComplete();
+        }
+
         renderBoard();
+
         renderObjectives();
+
     }).catch(error => {
+
         console.error(error);
+
         state.busy = false;
+
         renderBoard();
+
         renderObjectives();
+
     });
 }
+
 
 state.handleCellClick = handleClick;
 
+
+/*
+|--------------------------------------------------------------------------
+| BOTÓN JUGAR
+|--------------------------------------------------------------------------
+*/
+
 playButton.addEventListener("click", () => {
+
     initAudio();
 
     if (!state.playerName) {
+
         openNicknameModal();
+
         return;
     }
 
     playSelectSound();
+
     startScreen.classList.add("hidden");
+
     levelSelectScreen.classList.remove("hidden");
-    renderLevelButtons(levelNumber => loadLevel(levelNumber, handleClick));
+
+    renderLevelButtons(
+        levelNumber => loadLevel(
+            levelNumber,
+            handleClick
+        )
+    );
 });
 
+
+/*
+|--------------------------------------------------------------------------
+| VOLVER A PANTALLA INICIAL
+|--------------------------------------------------------------------------
+*/
+
 backToStartButton.addEventListener("click", () => {
+
     playSelectSound();
+
     levelSelectScreen.classList.add("hidden");
+
     startScreen.classList.remove("hidden");
 });
 
-if (rankingButton) {
-    rankingButton.addEventListener("click", () => {
-        initAudio();
-        playSelectSound();
-        openRankingModal();
-    });
-}
 
-const devUnlockButton = document.getElementById("devUnlockButton");
-if (devUnlockButton) {
-    devUnlockButton.addEventListener("click", () => {
-        state.unlockedLevel = TOTAL_LEVELS;
-        localStorage.setItem("candyUnlockedLevel", String(TOTAL_LEVELS));
-        renderLevelButtons(levelNumber => loadLevel(levelNumber, handleClick));
-    });
-}
+/*
+|--------------------------------------------------------------------------
+| NUEVO:
+| VOLVER AL MAPA DE NIVELES DESDE UNA PARTIDA
+|--------------------------------------------------------------------------
+*/
 
-if (closeRankingButton) {
-    closeRankingButton.addEventListener("click", () => {
-        playSelectSound();
-        closeRankingModal();
-    });
-}
+if (backToLevelsButton) {
 
-if (closeRankingButtonBottom) {
-    closeRankingButtonBottom.addEventListener("click", () => {
-        playSelectSound();
-        closeRankingModal();
-    });
-}
+    backToLevelsButton.addEventListener("click", () => {
 
-const rankingModal = document.getElementById("rankingModal");
-if (rankingModal) {
-    rankingModal.addEventListener("click", event => {
-        if (event.target === rankingModal) {
-            closeRankingModal();
-        }
-    });
-}
+        /*
+        |--------------------------------------------------------------------------
+        | Si hay una animación/combo en curso no salimos todavía.
+        | Esto evita dejar el tablero en un estado incorrecto.
+        |--------------------------------------------------------------------------
+        */
 
-nextLevelButton.addEventListener("click", () => {
-    initAudio();
-    playSelectSound();
+        if (state.busy) {
 
-    if (state.level < TOTAL_LEVELS) {
-        if (!hasLives()) {
-            document.getElementById("levelComplete").style.display = "none";
-            gameScreen.classList.add("hidden");
-            levelSelectScreen.classList.remove("hidden");
-            renderLevelButtons(levelNumber => loadLevel(levelNumber, handleClick));
             return;
         }
-        document.getElementById("levelComplete").style.display = "none";
+
+
+        playSelectSound();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Limpiamos la selección de piezas.
+        |--------------------------------------------------------------------------
+        */
+
+        state.selected = null;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Ocultamos la partida.
+        |--------------------------------------------------------------------------
+        */
+
         gameScreen.classList.add("hidden");
-        levelSelectScreen.classList.remove("hidden");
-        renderLevelButtons(levelNumber => loadLevel(levelNumber, handleClick));
-        return;
-    }
 
-    document.getElementById("levelComplete").innerHTML = `
-        <div class="resultIcon">🏆</div>
-        <h2>¡Completaste los 60 niveles!</h2>
-        <p>¡Felicitaciones!</p>
-        <button id="restartGameButton">Jugar de nuevo</button>
-    `;
 
-    document.getElementById("restartGameButton").addEventListener("click", () => {
-        localStorage.setItem("candyUnlockedLevel", "1");
-        state.unlockedLevel = 1;
+        /*
+        |--------------------------------------------------------------------------
+        | Ocultamos posibles ventanas de resultado.
+        |--------------------------------------------------------------------------
+        */
 
-        for (let i = 1; i <= TOTAL_LEVELS; i++) {
-            localStorage.removeItem(`candyBestScore_${i}`);
+        const levelComplete =
+            document.getElementById("levelComplete");
+
+        const levelFailed =
+            document.getElementById("levelFailed");
+
+
+        if (levelComplete) {
+            levelComplete.style.display = "none";
         }
 
-        gameScreen.classList.add("hidden");
-        levelSelectScreen.classList.remove("hidden");
-        renderLevelButtons(levelNumber => loadLevel(levelNumber, handleClick));
-    });
-});
+        if (levelFailed) {
+            levelFailed.style.display = "none";
+        }
 
-retryLevelButton.addEventListener("click", () => {
-    if (!hasLives()) {
-        document.getElementById("levelFailed").style.display = "none";
-        gameScreen.classList.add("hidden");
+
+        /*
+        |--------------------------------------------------------------------------
+        | Mostramos nuevamente el mapa de niveles.
+        |--------------------------------------------------------------------------
+        */
+
         levelSelectScreen.classList.remove("hidden");
-        renderLevelButtons(levelNumber => loadLevel(levelNumber, handleClick));
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Volvemos a dibujar los niveles.
+        |--------------------------------------------------------------------------
+        */
+
+        renderLevelButtons(
+            levelNumber => loadLevel(
+                levelNumber,
+                handleClick
+            )
+        );
+
+    });
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| RANKING
+|--------------------------------------------------------------------------
+*/
+
+if (rankingButton) {
+
+    rankingButton.addEventListener("click", () => {
+
+        initAudio();
+
+        playSelectSound();
+
+        openRankingModal();
+
+    });
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| BOTÓN DE PRUEBA:
+| DESBLOQUEAR NIVELES
+|--------------------------------------------------------------------------
+*/
+
+const devUnlockButton =
+    document.getElementById("devUnlockButton");
+
+
+if (devUnlockButton) {
+
+    devUnlockButton.addEventListener("click", () => {
+
+        state.unlockedLevel =
+            TOTAL_LEVELS;
+
+        localStorage.setItem(
+            "candyUnlockedLevel",
+            String(TOTAL_LEVELS)
+        );
+
+        renderLevelButtons(
+            levelNumber => loadLevel(
+                levelNumber,
+                handleClick
+            )
+        );
+
+    });
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| CERRAR RANKING
+|--------------------------------------------------------------------------
+*/
+
+if (closeRankingButton) {
+
+    closeRankingButton.addEventListener("click", () => {
+
+        playSelectSound();
+
+        closeRankingModal();
+
+    });
+
+}
+
+
+if (closeRankingButtonBottom) {
+
+    closeRankingButtonBottom.addEventListener("click", () => {
+
+        playSelectSound();
+
+        closeRankingModal();
+
+    });
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| CERRAR RANKING HACIENDO CLICK AFUERA
+|--------------------------------------------------------------------------
+*/
+
+const rankingModal =
+    document.getElementById("rankingModal");
+
+
+if (rankingModal) {
+
+    rankingModal.addEventListener("click", event => {
+
+        if (event.target === rankingModal) {
+
+            closeRankingModal();
+
+        }
+
+    });
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| SIGUIENTE NIVEL
+|--------------------------------------------------------------------------
+*/
+
+nextLevelButton.addEventListener("click", () => {
+
+    initAudio();
+
+    playSelectSound();
+
+
+    if (state.level < TOTAL_LEVELS) {
+
+        if (!hasLives()) {
+
+            document.getElementById(
+                "levelComplete"
+            ).style.display = "none";
+
+            gameScreen.classList.add("hidden");
+
+            levelSelectScreen.classList.remove("hidden");
+
+            renderLevelButtons(
+                levelNumber => loadLevel(
+                    levelNumber,
+                    handleClick
+                )
+            );
+
+            return;
+        }
+
+
+        document.getElementById(
+            "levelComplete"
+        ).style.display = "none";
+
+
+        gameScreen.classList.add("hidden");
+
+        levelSelectScreen.classList.remove("hidden");
+
+
+        renderLevelButtons(
+            levelNumber => loadLevel(
+                levelNumber,
+                handleClick
+            )
+        );
+
         return;
     }
-    initAudio();
-    playSelectSound();
-    loadLevel(state.level, handleClick);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | COMPLETÓ LOS 60 NIVELES
+    |--------------------------------------------------------------------------
+    */
+
+    document.getElementById(
+        "levelComplete"
+    ).innerHTML = `
+
+        <div class="resultIcon">
+            🏆
+        </div>
+
+        <h2>
+            ¡Completaste los 60 niveles!
+        </h2>
+
+        <p>
+            ¡Felicitaciones!
+        </p>
+
+        <button id="restartGameButton">
+            Jugar de nuevo
+        </button>
+
+    `;
+
+
+    document
+        .getElementById("restartGameButton")
+        .addEventListener("click", () => {
+
+            localStorage.setItem(
+                "candyUnlockedLevel",
+                "1"
+            );
+
+            state.unlockedLevel = 1;
+
+
+            for (
+                let i = 1;
+                i <= TOTAL_LEVELS;
+                i++
+            ) {
+
+                localStorage.removeItem(
+                    `candyBestScore_${i}`
+                );
+
+            }
+
+
+            gameScreen.classList.add("hidden");
+
+            levelSelectScreen.classList.remove("hidden");
+
+
+            renderLevelButtons(
+                levelNumber => loadLevel(
+                    levelNumber,
+                    handleClick
+                )
+            );
+
+        });
+
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| REINTENTAR NIVEL
+|--------------------------------------------------------------------------
+*/
+
+retryLevelButton.addEventListener("click", () => {
+
+    if (!hasLives()) {
+
+        document.getElementById(
+            "levelFailed"
+        ).style.display = "none";
+
+        gameScreen.classList.add("hidden");
+
+        levelSelectScreen.classList.remove("hidden");
+
+
+        renderLevelButtons(
+            levelNumber => loadLevel(
+                levelNumber,
+                handleClick
+            )
+        );
+
+        return;
+    }
+
+
+    initAudio();
+
+    playSelectSound();
+
+    loadLevel(
+        state.level,
+        handleClick
+    );
+
+});
+/*
+|--------------------------------------------------------------------------
+| OPCIONES DEL NIVEL FALLIDO
+|--------------------------------------------------------------------------
+*/
+
+
+/*
+|--------------------------------------------------------------------------
+| ABRIR TIENDA DESDE NIVEL FALLIDO
+|--------------------------------------------------------------------------
+*/
+
+if (failedShopButton) {
+
+    failedShopButton.addEventListener(
+        "click",
+        () => {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Inicializamos audio
+            |--------------------------------------------------------------------------
+            */
+
+            initAudio();
+
+            playSelectSound();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Abrimos la tienda
+            |--------------------------------------------------------------------------
+            */
+
+            openShopModal();
+
+        }
+    );
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| COMPRAR +5 MOVIMIENTOS
+|--------------------------------------------------------------------------
+|
+| El jugador compra el potenciador por 200 monedas
+| y automáticamente lo utiliza.
+|
+*/
+
+if (failedExtraMovesButton) {
+
+    failedExtraMovesButton.addEventListener(
+        "click",
+        () => {
+
+            initAudio();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Intentamos comprar +5 movimientos
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                buyBooster(
+                    "extraMoves"
+                )
+            ) {
+
+                /*
+                |--------------------------------------------------------------------------
+                | Utilizamos inmediatamente el potenciador
+                |--------------------------------------------------------------------------
+                */
+
+                useExtraMovesBooster();
+
+            }
+
+        }
+    );
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| VOLVER AL MAPA DE NIVELES
+|--------------------------------------------------------------------------
+*/
+
+if (failedBackToLevelsButton) {
+
+    failedBackToLevelsButton.addEventListener(
+        "click",
+        () => {
+
+            initAudio();
+
+            playSelectSound();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Ocultamos pantalla de nivel fallido
+            |--------------------------------------------------------------------------
+            */
+
+            const levelFailed =
+                document.getElementById(
+                    "levelFailed"
+                );
+
+
+            if (levelFailed) {
+
+                levelFailed.style.display =
+                    "none";
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Limpiamos selección
+            |--------------------------------------------------------------------------
+            */
+
+            state.selected = null;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Ocultamos el juego
+            |--------------------------------------------------------------------------
+            */
+
+            gameScreen.classList.add(
+                "hidden"
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Mostramos mapa de niveles
+            |--------------------------------------------------------------------------
+            */
+
+            levelSelectScreen.classList.remove(
+                "hidden"
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Dibujamos nuevamente los niveles
+            |--------------------------------------------------------------------------
+            */
+
+            renderLevelButtons(
+                levelNumber =>
+                    loadLevel(
+                        levelNumber,
+                        handleClick
+                    )
+            );
+
+        }
+    );
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| VIDAS
+|--------------------------------------------------------------------------
+*/
 
 renderLives();
